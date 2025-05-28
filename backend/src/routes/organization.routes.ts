@@ -1,0 +1,70 @@
+import { FastifyInstance } from 'fastify';
+import {
+  getOrganizations,
+  getOrganizationById,
+  createOrganization,
+  updateOrganization,
+  deleteOrganization,
+} from '../services/organization.service';
+import { verifyAuth } from '../middlewares/verifyAuth';
+import { verifyTenant } from '../middlewares/verifyTenant';
+import { verifyRole } from '../middlewares/verifyRole';
+import { auditLog } from '../middlewares/auditLog';
+
+export async function organizationRoutes(fastify: FastifyInstance) {
+  fastify.addHook('preHandler', verifyAuth);
+  fastify.addHook('preHandler', verifyTenant);
+  fastify.addHook('preHandler', auditLog);
+
+  fastify.get('/organizations', async (request, reply) => {
+    const tenantId = (request as any).tenantId;
+    const organizations = await getOrganizations(tenantId);
+    reply.send(organizations);
+  });
+
+  fastify.get('/organizations/:id', async (request, reply) => {
+    const { id } = request.params as any;
+    const organization = await getOrganizationById(id);
+    if (!organization) {
+      reply.status(404).send({ error: 'Organization not found' });
+      return;
+    }
+    reply.send(organization);
+  });
+
+  fastify.post('/organizations', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
+    const tenantId = (request as any).tenantId;
+    const organizationData = request.body as any;
+    try {
+      const organization = await createOrganization(organizationData, tenantId);
+      reply.status(201).send(organization);
+    } catch (error) {
+      reply.status(500).send({ error: 'Failed to create organization' });
+    }
+  });
+
+  fastify.put('/organizations/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
+    const { id } = request.params as any;
+    const organizationData = request.body as any;
+    try {
+      const organization = await updateOrganization(id, organizationData);
+      if (!organization) {
+        reply.status(404).send({ error: 'Organization not found' });
+        return;
+      }
+      reply.send(organization);
+    } catch (error) {
+      reply.status(500).send({ error: 'Failed to update organization' });
+    }
+  });
+
+  fastify.delete('/organizations/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
+    const { id } = request.params as any;
+    try {
+      await deleteOrganization(id);
+      reply.status(204).send();
+    } catch (error) {
+      reply.status(500).send({ error: 'Failed to delete organization' });
+    }
+  });
+}

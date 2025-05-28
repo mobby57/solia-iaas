@@ -1,0 +1,15 @@
+services:
+  - name: solia-backend
+    env: node
+    plan: starter
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: DATABASE_URL
+        value: "your_mongodb_connection_string"
+      - key: JWT_SECRET
+        value: "your_jwt_secret_here"
+    routes:
+      - type: web
+        src: /
+        dest: 3000

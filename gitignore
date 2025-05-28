@@ -1,0 +1,40 @@
+# Node
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.cache/
+turbo/
+.vite/
+.eslintcache
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+*.log.*
+
+# IDEs & OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Prisma
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+apps/api/prisma/migrations/
