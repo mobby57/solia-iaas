@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const CreateDonationSchema = z.object({
   amount: z.number(),
   donorId: z.string(),
+  organizationId: z.string(),
   // TODO: Add other donation fields as needed
 });
 

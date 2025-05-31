@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// === ROLES & KYC ===
 model Role {
   id          String           @id @default(auto()) @map("_id") @db.ObjectId
   name        String           @unique
@@ -16,11 +17,13 @@ model Role {
   tenantId    String
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+
+  @@index([tenantId])
 }
 
 model KYCFieldConfig {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  roleId    String
+  roleId    String   @db.ObjectId
   role      Role     @relation(fields: [roleId], references: [id])
   fieldName String
   fieldType String
@@ -29,66 +32,79 @@ model KYCFieldConfig {
   tenantId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
 }
 
+// === USER ===
 model User {
-  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
-  email               String                @unique
-  password            String
-  name                String
-  roleId              String
-  role                Role                  @relation(fields: [roleId], references: [id])
-  organizationId      String?
-  organization        Organization?         @relation(fields: [organizationId], references: [id])
-  kycData             Json?
-  donations           Donation[]
-  tasks               Task[]
-  comments            Comment[]
-  tenantId            String
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  createdBy           String?
-  updatedBy           String?
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  email          String         @unique
+  password       String
+  name           String
+  roleId         String?        @db.ObjectId
+  role           Role?          @relation(fields: [roleId], references: [id])
+  organizationId String?        @db.ObjectId
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
+  kycData        Json?
+  donations      Donation[]
+  tasks          Task[]
+  comments       Comment[]
+  notifications  Notification[]
+  chatbots       Chatbot[]      @relation("UserChatbots")
+  tenantId       String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  createdBy      String?
+  updatedBy      String?
+
+  @@index([tenantId])
 }
 
+// === ORGANIZATION ===
 model Organization {
-  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
-  name                String
-  users               User[]
-  donations           Donation[]
-  missions            Mission[]
-  documents           Document[]
-  tenantId            String
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  createdBy           String?
-  updatedBy           String?
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  users     User[]
+  donations Donation[]
+  missions  Mission[]
+  documents Document[]
+  tenantId  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@index([tenantId])
 }
 
+// === MISSION / TASK ===
 model Mission {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   type           String
   startDate      DateTime
   endDate        DateTime
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String?       @db.ObjectId
+  organization   Organization? @relation(fields: [organizationId], references: [id])
   donations      Donation[]
   tasks          Task[]
+  documents      Document[]
   tenantId       String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   createdBy      String?
   updatedBy      String?
-  documents      Document[]
+
+  @@index([tenantId])
 }
 
 model Task {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  missionId String
-  mission   Mission  @relation(fields: [missionId], references: [id])
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  missionId String?  @db.ObjectId
+  mission   Mission? @relation(fields: [missionId], references: [id])
   date      DateTime
   status    String
   tenantId  String
@@ -96,17 +112,20 @@ model Task {
   updatedAt DateTime @updatedAt
   createdBy String?
   updatedBy String?
+
+  @@index([tenantId])
 }
 
+// === DONATIONS ===
 model Donation {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   amount         Float
   date           DateTime
-  donorId        String
+  donorId        String       @db.ObjectId
   donor          User         @relation(fields: [donorId], references: [id])
-  organizationId String
+  organizationId String       @db.ObjectId
   organization   Organization @relation(fields: [organizationId], references: [id])
-  missionId      String?
+  missionId      String?      @db.ObjectId
   mission        Mission?     @relation(fields: [missionId], references: [id])
   status         String?
   comment        String?
@@ -115,30 +134,38 @@ model Donation {
   updatedAt      DateTime     @updatedAt
   createdBy      String?
   updatedBy      String?
+
+  @@unique([id, tenantId], name: "id_tenantId")
+  @@index([tenantId])
 }
 
+// === DOCUMENTS ===
 model Document {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
   url            String
   name           String
-  organizationId String?
+  organizationId String?       @db.ObjectId
   organization   Organization? @relation(fields: [organizationId], references: [id])
-  missionId      String?
+  missionId      String?       @db.ObjectId
   mission        Mission?      @relation(fields: [missionId], references: [id])
   tenantId       String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   createdBy      String?
   updatedBy      String?
+
+  @@index([tenantId])
 }
 
+// === COMMENTAIRES / TAGS ===
 model Comment {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   content    String
-  userId     String
+  userId     String   @db.ObjectId
   user       User     @relation(fields: [userId], references: [id])
-  targetId   String
-  targetType String
+  targetId   String // ID de l'entité commentée
+  targetType String // Type d'entité (ex: "Mission", "Donation")
   tenantId   String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -157,4 +184,95 @@ model Tag {
   updatedAt  DateTime @updatedAt
   createdBy  String?
   updatedBy  String?
+
+  @@index([tenantId])
+}
+
+// === NOTIFICATIONS ===
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  SYSTEM
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Notification {
+  id           String               @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  body         String
+  type         NotificationType
+  priority     NotificationPriority
+  read         Boolean              @default(false)
+  link         String?
+  resourceType String?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  userId       String?              @db.ObjectId
+  user         User?                @relation(fields: [userId], references: [id])
+  tenantId     String               @map("tenant_id")
+
+  @@index([tenantId])
+}
+
+// === CHATBOTS ===
+model Chatbot {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId      String
+  name          String
+  description   String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  createdById   String         @db.ObjectId
+  createdBy     User           @relation("UserChatbots", fields: [createdById], references: [id])
+  conversations Conversation[]
+
+  @@index([tenantId])
+  @@index([createdById])
+}
+
+model Conversation {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  chatbotId String    @db.ObjectId
+  chatbot   Chatbot   @relation(fields: [chatbotId], references: [id])
+  tenantId  String
+  userId    String?   @db.ObjectId
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  messages  Message[]
+
+  @@index([chatbotId])
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         String
+  content        String
+  sentAt         DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+// === AUDIT LOG ===
+model Audit {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  action    String
+  entity    String
+  entityId  String
+  updatedAt DateTime @updatedAt
+  updatedBy String
+  tenantId  String
+
+  @@index([tenantId])
 }

@@ -1,11 +1,7 @@
 import 'fastify';
 
 declare module 'fastify' {
-  interface FastifyRequest {
-    jwtVerify(): Promise<void>;
-    user?: {
-      role?: string;
-      [key: string]: any;
-    };
+  interface FastifyInstance {
+    prisma: import('@prisma/client').PrismaClient;
   }
 }

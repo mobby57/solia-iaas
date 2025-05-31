@@ -3,7 +3,7 @@ import prisma from '../../lib/prisma';
 import * as organizationService from './organization.service';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
 
-let tenantId = 'test-tenant';
+let tenantId = '507f1f77bcf86cd799439011';
 
 describe('Organization Service', () => {
   beforeEach(async () => {
@@ -45,7 +45,7 @@ describe('Organization Service', () => {
         tenantId,
       },
     });
-    const updated = await organizationService.updateOrganization(created.id, { name: 'Updated Org' });
+    const updated = await organizationService.updateOrganization(created.id, { name: 'Updated Org' }, tenantId);
     expect(updated).toBeDefined();
   });
 
@@ -56,7 +56,7 @@ describe('Organization Service', () => {
         tenantId,
       },
     });
-    const deleted = await organizationService.deleteOrganization(created.id);
+    const deleted = await organizationService.deleteOrganization(created.id, tenantId);
     expect(deleted.id).toBe(created.id);
   });
 });

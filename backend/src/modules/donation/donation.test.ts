@@ -5,11 +5,22 @@ import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
 
 let donorId: string;
 let organizationId: string;
-const tenantId = 'test-tenant';
+const tenantId = '507f1f77bcf86cd799439011';
 
 describe('Donation Service', () => {
   beforeEach(async () => {
     await cleanDatabase();
+
+    // Ensure Role 'USER' exists
+    const role = await prisma.role.upsert({
+      where: { name: 'USER' },
+      update: {},
+      create: {
+        name: 'USER',
+        tenantId,
+      },
+    });
+    console.log('Role upserted:', role);
 
     // Create an organization for relation
     const organization = await prisma.organization.create({
@@ -20,13 +31,15 @@ describe('Donation Service', () => {
     });
     organizationId = organization.id;
 
-    // Create a donor user for relation
+    // Create a donor user for relation with randomized email
     const donor = await prisma.user.create({
       data: {
-        email: 'donor@test.com',
+        email: `donor+${Date.now()}@example.com`,
         password: 'password123',
         name: 'Test Donor',
-        role: 'USER',
+        role: {
+          connect: { name: 'USER' }
+        },
         tenantId,
       },
     });
@@ -75,23 +88,18 @@ describe('Donation Service', () => {
   });
 
   it('should update a donation', async () => {
-    const created = await prisma.donation.create({
-      data: {
-        amount: 100,
-        date: new Date(),
-        tenantId,
-        donor: {
-          connect: { id: donorId },
-        },
-        organization: {
-          connect: { id: organizationId },
-        },
-      },
-    });
+    const created = await donationService.createDonation({
+      amount: 100,
+      date: new Date(),
+      donorId,
+      organizationId,
+    }, tenantId);
+    console.log('Update Donation Test - created.id:', created.id);
+    console.log('Update Donation Test - tenantId:', tenantId);
     const updated = await donationService.updateDonation(created.id, {
       amount: 200,
       date: new Date(),
-    });
+    }, tenantId);
     expect(updated).toBeDefined();
   });
 
@@ -109,7 +117,7 @@ describe('Donation Service', () => {
         },
       },
     });
-    const deleted = await donationService.deleteDonation(created.id);
+    const deleted = await donationService.deleteDonation(created.id, tenantId);
     expect(deleted.id).toBe(created.id);
   });
 });

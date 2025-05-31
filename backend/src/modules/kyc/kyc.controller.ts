@@ -1,63 +1,65 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import * as kycService from './kyc.service';
+import {
+  getKycFieldConfigsByRole,
+  createKycFieldConfig,
+  updateKycFieldConfig,
+  deleteKycFieldConfig,
+} from './kyc.service';
 import { CreateKycSchema, UpdateKycSchema } from './kyc.schema';
 
-export async function getKycs(request: FastifyRequest, reply: FastifyReply) {
+export async function getKycFieldConfigsByRoleController(request: FastifyRequest, reply: FastifyReply) {
+  const { roleId } = request.params as any;
   const tenantId = (request as any).tenantId;
+
   try {
-    const kycs = await kycService.getKycs(tenantId);
-    reply.send(kycs);
+    const configs = await getKycFieldConfigsByRole(roleId, tenantId);
+    reply.send(configs);
   } catch (error) {
-    reply.status(500).send({ error: 'Failed to fetch KYC records' });
+    reply.status(500).send({ error: 'Failed to fetch KYC field configurations' });
   }
 }
 
-export async function getKycById(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as any;
-  try {
-    const kyc = await kycService.getKycById(id);
-    if (!kyc) {
-      reply.status(404).send({ error: 'KYC record not found' });
-      return;
-    }
-    reply.send(kyc);
-  } catch (error) {
-    reply.status(500).send({ error: 'Failed to fetch KYC record' });
-  }
-}
-
-export async function createKyc(request: FastifyRequest, reply: FastifyReply) {
+export async function createKycFieldConfigController(request: FastifyRequest, reply: FastifyReply) {
   const tenantId = (request as any).tenantId;
-  const kycData = request.body as any;
+  const kycData = request.body;
+
   try {
-    const kyc = await kycService.createKyc(kycData, tenantId);
-    reply.status(201).send(kyc);
+    const parsed = CreateKycSchema.parse(kycData);
+    const created = await createKycFieldConfig(parsed, tenantId);
+    reply.status(201).send(created);
   } catch (error) {
-    reply.status(500).send({ error: 'Failed to create KYC record' });
+    reply.status(400).send({ error: 'Invalid KYC data' });
   }
 }
 
-export async function updateKyc(request: FastifyRequest, reply: FastifyReply) {
+export async function updateKycFieldConfigController(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as any;
-  const kycData = request.body as any;
+  const tenantId = (request as any).tenantId;
+  const kycData = request.body;
+
   try {
-    const kyc = await kycService.updateKyc(id, kycData);
-    if (!kyc) {
-      reply.status(404).send({ error: 'KYC record not found' });
-      return;
-    }
-    reply.send(kyc);
+    const parsed = UpdateKycSchema.parse(kycData);
+    const updated = await updateKycFieldConfig(id, { ...parsed, tenantId });
+    reply.send(updated);
   } catch (error) {
-    reply.status(500).send({ error: 'Failed to update KYC record' });
+    reply.status(400).send({ error: 'Invalid KYC data' });
   }
 }
 
-export async function deleteKyc(request: FastifyRequest, reply: FastifyReply) {
+export async function deleteKycFieldConfigController(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as any;
+
   try {
-    await kycService.deleteKyc(id);
+    await deleteKycFieldConfig(id);
     reply.status(204).send();
   } catch (error) {
-    reply.status(500).send({ error: 'Failed to delete KYC record' });
+    reply.status(500).send({ error: 'Failed to delete KYC data' });
   }
 }
+
+export {
+  getKycFieldConfigsByRoleController as getKycFieldConfigsByRole,
+  createKycFieldConfigController as createKycFieldConfig,
+  updateKycFieldConfigController as updateKycFieldConfig,
+  deleteKycFieldConfigController as deleteKycFieldConfig,
+};

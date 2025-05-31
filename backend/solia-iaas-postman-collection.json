@@ -1,0 +1,221 @@
+{
+  "info": {
+    "name": "Solia IaaS API Extended",
+    "_postman_id": "solia-iaas-api-collection-extended",
+    "description": "Extended collection of Solia IaaS API routes with full role-based flows",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "ongToken",
+      "value": ""
+    },
+    {
+      "key": "freelancerToken",
+      "value": ""
+    },
+    {
+      "key": "donorToken",
+      "value": ""
+    },
+    {
+      "key": "tenantId",
+      "value": "default-tenant"
+    },
+    {
+      "key": "roleOngId",
+      "value": "<role_ong_id>"
+    },
+    {
+      "key": "roleFreelancerId",
+      "value": "<role_freelancer_id>"
+    },
+    {
+      "key": "roleDonorId",
+      "value": "<role_donor_id>"
+    },
+    {
+      "key": "roleAdminId",
+      "value": "<role_admin_id>"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Signup ONG",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ong@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"ONG Example\",\n  \"roleId\": \"{{roleOngId}}\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/signup", "host": ["{{baseUrl}}"], "path": ["auth", "signup"] }
+      }
+    },
+    {
+      "name": "Auth - Login ONG",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ong@example.com\",\n  \"password\": \"password123\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "ONG - Upload KYC Document",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{ongToken}}" },
+          { "key": "Content-Type", "value": "multipart/form-data" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "/path/to/kyc-document.pdf"
+            }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/org/documents", "host": ["{{baseUrl}}"], "path": ["org", "documents"] }
+      }
+    },
+    {
+      "name": "ONG - Get Missions",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{ongToken}}" }],
+        "url": { "raw": "{{baseUrl}}/missions", "host": ["{{baseUrl}}"], "path": ["missions"] }
+      }
+    },
+    {
+      "name": "ONG - Get Donations",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{ongToken}}" }],
+        "url": { "raw": "{{baseUrl}}/donations", "host": ["{{baseUrl}}"], "path": ["donations"] }
+      }
+    },
+    {
+      "name": "Freelancer - Signup",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"freelancer@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Freelancer User\",\n  \"roleId\": \"{{roleFreelancerId}}\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/signup?role=freelancer", "host": ["{{baseUrl}}"], "path": ["auth", "signup"], "query": [{ "key": "role", "value": "freelancer" }] }
+      }
+    },
+    {
+      "name": "Freelancer - Get Today's Missions",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{freelancerToken}}" }],
+        "url": { "raw": "{{baseUrl}}/missions/today", "host": ["{{baseUrl}}"], "path": ["missions", "today"] }
+      }
+    },
+    {
+      "name": "Freelancer - Post Daily Report",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{freelancerToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"report\": \"Report content here\",\n  \"missionId\": \"<mission_id>\",\n  \"date\": \"2025-05-31\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/missions/<mission_id>/report", "host": ["{{baseUrl}}"], "path": ["missions", "<mission_id>", "report"] }
+      }
+    },
+    {
+      "name": "Donor - Make Donation",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 100,\n  \"method\": \"credit_card\",\n  \"donorId\": \"<donor_id>\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/donate", "host": ["{{baseUrl}}"], "path": ["donate"] }
+      }
+    },
+    {
+      "name": "Donor - Create SEPA Mandate",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mandateData\": \"<mandate_data>\",\n  \"donorId\": \"<donor_id>\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/donate/mandate", "host": ["{{baseUrl}}"], "path": ["donate", "mandate"] }
+      }
+    },
+    {
+      "name": "Donor - Get Personal History",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{donorToken}}" }],
+        "url": { "raw": "{{baseUrl}}/me", "host": ["{{baseUrl}}"], "path": ["me"] }
+      }
+    },
+    {
+      "name": "Donor - Get Fiscal Receipt",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{donorToken}}" }],
+        "url": { "raw": "{{baseUrl}}/documents/receipt", "host": ["{{baseUrl}}"], "path": ["documents", "receipt"] }
+      }
+    },
+    {
+      "name": "Admin - Create Contract",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"contractDetails\": \"Contract details here\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/contracts/create", "host": ["{{baseUrl}}"], "path": ["contracts", "create"] }
+      }
+    },
+    {
+      "name": "Admin - Add API Integration",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"integrationName\": \"HelloAsso\",\n  \"config\": {}\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api-integrations", "host": ["{{baseUrl}}"], "path": ["api-integrations"] }
+      }
+    },
+    {
+      "name": "Admin - Get Audit Logs",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": { "raw": "{{baseUrl}}/audit-logs", "host": ["{{baseUrl}}"], "path": ["audit-logs"] }
+      }
+    }
+  ]
+}

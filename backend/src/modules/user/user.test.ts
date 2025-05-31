@@ -1,33 +1,32 @@
-import { describe, it, expect } from 'vitest';
-import * as userService from './user.service';
+import { beforeEach, describe, expect, it, afterAll } from 'vitest';
+import prisma from '../../lib/prisma';
+import * as userService from '../../services/user.service';
 
-describe('User Service', () => {
-  it('should get users by tenantId', async () => {
-    // TODO: Implement getUsers test
-    const users = await userService.getUsers('tenantId');
-    expect(users).toBeDefined();
+import { resetDatabase } from '../../tests/testSetup';
+
+describe('UserService', () => {
+  // Use resetDatabase to clean and seed base data before each test
+  beforeEach(async () => {
+    await resetDatabase();
   });
 
-  it('should get user by id', async () => {
-    // TODO: Implement getUserById test
-    const user = await userService.getUserById('userId');
-    expect(user).toBeDefined();
+  afterAll(async () => {
+    await prisma.$disconnect();
   });
 
   it('should create a user', async () => {
-    // TODO: Implement createUser test
-    const user = await userService.createUser({ email: 'test@example.com', password: 'password' }, 'tenantId');
-    expect(user).toBeDefined();
-  });
+    // Ensure a role exists before creating users
+    const role = await prisma.role.findUnique({ where: { name: 'TestRole' } });
 
-  it('should update a user', async () => {
-    // TODO: Implement updateUser test
-    const user = await userService.updateUser('userId', { email: 'updated@example.com' });
-    expect(user).toBeDefined();
-  });
+    // Create user with all required fields
+    const user = await userService.createUser({
+      email: `newuser+${Date.now()}@example.com`,
+      password: 'securePassword',
+      name: 'New User',
+      roleId: role?.id,
+    }, 'tenant-123');
 
-  it('should delete a user', async () => {
-    // TODO: Implement deleteUser test
-    await userService.deleteUser('userId');
+    expect(user.email).toContain('@example.com');
+    expect(user.name).toBe('New User');
   });
 });

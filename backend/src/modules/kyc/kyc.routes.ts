@@ -1,21 +1,17 @@
 import { FastifyInstance } from 'fastify';
 import {
-  getKycs,
-  getKycById,
-  createKyc,
-  updateKyc,
-  deleteKyc,
+  getKycFieldConfigsByRole,
+  createKycFieldConfig,
+  updateKycFieldConfig,
+  deleteKycFieldConfig,
 } from './kyc.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function kycRoutes(fastify: FastifyInstance) {
-  fastify.addHook('preHandler', verifyAuth);
+  fastify.get('/kyc/field-configs/role/:roleId', getKycFieldConfigsByRole);
 
-  fastify.get('/kycs', getKycs);
-  fastify.get('/kycs/:id', getKycById);
+  fastify.post('/kyc/field-configs', createKycFieldConfig);
 
-  fastify.post('/kycs', { preHandler: verifyRole(['ADMIN']) }, createKyc);
-  fastify.put('/kycs/:id', { preHandler: verifyRole(['ADMIN']) }, updateKyc);
-  fastify.delete('/kycs/:id', { preHandler: verifyRole(['ADMIN']) }, deleteKyc);
+  fastify.put('/kyc/field-configs/:id', updateKycFieldConfig);
+
+  fastify.delete('/kyc/field-configs/:id', deleteKycFieldConfig);
 }

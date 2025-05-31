@@ -1,4 +1,4 @@
-import { prisma } from '../models/prisma';
+import prisma from '../lib/prisma';
 import bcrypt from 'bcrypt';
 
 export async function getUsers(tenantId: string) {
@@ -20,16 +20,27 @@ export async function createUser(userData: any, tenantId: string) {
   });
 }
 
-export async function updateUser(id: string, userData: any) {
+export async function updateUser(id: string, userData: any, tenantId: string) {
+  const existingUser = await prisma.user.findUnique({ where: { id } });
+  if (!existingUser) {
+    throw new Error(`User with id ${id} not found`);
+  }
   if (userData.password) {
     userData.password = await bcrypt.hash(userData.password, 10);
   }
   return prisma.user.update({
     where: { id },
-    data: userData,
+    data: { ...userData, tenantId },
   });
 }
 
 export async function deleteUser(id: string) {
-  return prisma.user.delete({ where: { id } });
+  try {
+    return await prisma.user.delete({ where: { id } });
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      throw new Error('No user found for delete with the given id');
+    }
+    throw error;
+  }
 }

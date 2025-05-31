@@ -1,64 +1,53 @@
 import { FastifyInstance } from 'fastify';
-import { getUsers, getUserById, createUser, updateUser, deleteUser } from '../services/user.service';
-import { verifyAuth } from '../middlewares/verifyAuth';
-import { verifyTenant } from '../middlewares/verifyTenant';
-import { auditLog } from '../middlewares/auditLog';
-import { verifyRole } from '../middlewares/verifyRole';
+import { tenantMiddleware } from '../middlewares/tenantMiddleware';
+import { createUser, updateUser, getUserById, getUsers } from '../services/user.service';
 
 export async function userRoutes(fastify: FastifyInstance) {
-  fastify.addHook('preHandler', verifyAuth);
-  fastify.addHook('preHandler', verifyTenant);
-  fastify.addHook('preHandler', auditLog);
+  fastify.addHook('preHandler', tenantMiddleware);
 
   fastify.get('/users', async (request, reply) => {
     const tenantId = (request as any).tenantId;
-    const users = await getUsers(tenantId);
-    reply.send(users);
-  });
-
-  fastify.get('/users/:id', async (request, reply) => {
-    const { id } = request.params as any;
-    const user = await getUserById(id);
-    if (!user) {
-      reply.status(404).send({ error: 'User not found' });
-      return;
+    try {
+      const users = await getUsers(tenantId);
+      reply.send(users);
+    } catch (error) {
+      reply.status(500).send({ error: 'Failed to get users' });
     }
-    reply.send(user);
   });
 
-  fastify.post('/users', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
+  fastify.post('/users', async (request, reply) => {
     const tenantId = (request as any).tenantId;
     const userData = request.body as any;
+
     try {
       const user = await createUser(userData, tenantId);
-      reply.status(201).send(user);
+      reply.send(user);
     } catch (error) {
       reply.status(500).send({ error: 'Failed to create user' });
     }
   });
 
-  fastify.put('/users/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
-    const { id } = request.params as any;
-    const userData = request.body as any;
+  fastify.put('/users/:id', async (request, reply) => {
+    const tenantId = (request as any).tenantId;
+    const userId = (request.params as any).id;
+    const updateData = request.body as any;
+
     try {
-      const user = await updateUser(id, userData);
-      if (!user) {
-        reply.status(404).send({ error: 'User not found' });
-        return;
-      }
-      reply.send(user);
+      const updatedUser = await updateUser(userId, updateData, tenantId);
+      reply.send(updatedUser);
     } catch (error) {
       reply.status(500).send({ error: 'Failed to update user' });
     }
   });
 
-  fastify.delete('/users/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
-    const { id } = request.params as any;
+  fastify.get('/users/:id', async (request, reply) => {
+    const userId = (request.params as any).id;
+
     try {
-      await deleteUser(id);
-      reply.status(204).send();
+      const user = await getUserById(userId);
+      reply.send(user);
     } catch (error) {
-      reply.status(500).send({ error: 'Failed to delete user' });
+      reply.status(404).send({ error: 'User not found' });
     }
   });
 }

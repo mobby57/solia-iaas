@@ -11,8 +11,10 @@ import { verifyTenant } from '../middlewares/verifyTenant';
 import { verifyRole } from '../middlewares/verifyRole';
 import { auditLog } from '../middlewares/auditLog';
 
+import { tenantMiddleware } from '../middlewares/tenantMiddleware';
+
 export async function taskRoutes(fastify: FastifyInstance) {
-  fastify.addHook('preHandler', verifyAuth);
+  fastify.addHook('preHandler', tenantMiddleware);
   fastify.addHook('preHandler', verifyTenant);
   fastify.addHook('preHandler', auditLog);
 
@@ -24,7 +26,8 @@ export async function taskRoutes(fastify: FastifyInstance) {
 
   fastify.get('/tasks/:id', async (request, reply) => {
     const { id } = request.params as any;
-    const task = await getTaskById(id);
+    const tenantId = (request as any).tenantId;
+    const task = await getTaskById(id, tenantId);
     if (!task) {
       reply.status(404).send({ error: 'Task not found' });
       return;
@@ -46,8 +49,9 @@ export async function taskRoutes(fastify: FastifyInstance) {
   fastify.put('/tasks/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
     const { id } = request.params as any;
     const taskData = request.body as any;
+    const tenantId = (request as any).tenantId;
     try {
-      const task = await updateTask(id, taskData);
+      const task = await updateTask(id, taskData, tenantId);
       if (!task) {
         reply.status(404).send({ error: 'Task not found' });
         return;
@@ -60,8 +64,9 @@ export async function taskRoutes(fastify: FastifyInstance) {
 
   fastify.delete('/tasks/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
     const { id } = request.params as any;
+    const tenantId = (request as any).tenantId;
     try {
-      await deleteTask(id);
+      await deleteTask(id, tenantId);
       reply.status(204).send();
     } catch (error) {
       reply.status(500).send({ error: 'Failed to delete task' });

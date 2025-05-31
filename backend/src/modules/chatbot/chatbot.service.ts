@@ -1,45 +1,23 @@
-model Chatbot {
-  id            String    @id @default(uuid())
-  tenantId      String    // multi-tenant : l'organisation propriétaire du chatbot
-  name          String
-  description   String?   
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+import prisma from '../../lib/prisma';
 
-  createdById   String    // utilisateur qui a créé ce chatbot
-  createdBy     User      @relation(fields: [createdById], references: [id])
+export class ChatbotService {
+  static async getChatbots(tenantId: string) {
+    return prisma.chatbot.findMany({ where: { tenantId } });
+  }
 
-  conversations Conversation[]
+  static async getChatbotById(id: string) {
+    return prisma.chatbot.findUnique({ where: { id } });
+  }
 
-  @@index([tenantId])
-  @@index([createdById])
-}
+  static async createChatbot(data: any, tenantId: string) {
+    return prisma.chatbot.create({ data: { ...data, tenantId } });
+  }
 
-model Conversation {
-  id            String    @id @default(uuid())
-  chatbotId     String
-  tenantId      String    // multi-tenant
-  userId        String?   // utilisateur (donateur, opérateur, etc.) qui converse avec le chatbot
-  startedAt     DateTime  @default(now())
-  endedAt       DateTime?
+  static async updateChatbot(id: string, data: any) {
+    return prisma.chatbot.update({ where: { id }, data });
+  }
 
-  chatbot       Chatbot   @relation(fields: [chatbotId], references: [id])
-  messages      Message[]
-
-  @@index([chatbotId])
-  @@index([tenantId])
-  @@index([userId])
-}
-
-model Message {
-  id              String    @id @default(uuid())
-  conversationId  String
-  sender          String    // exemple: 'user', 'bot', ou même 'operator'
-  content         String
-  sentAt          DateTime  @default(now())
-
-  conversation    Conversation @relation(fields: [conversationId], references: [id])
-
-  @@index([conversationId])
+  static async deleteChatbot(id: string) {
+    return prisma.chatbot.delete({ where: { id } });
+  }
 }

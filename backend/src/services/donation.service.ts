@@ -1,4 +1,4 @@
-import { prisma } from '../models/prisma';
+import prisma from '../lib/prisma';
 
 export async function getDonations(tenantId: string) {
   return prisma.donation.findMany({ where: { tenantId } });
@@ -9,10 +9,17 @@ export async function getDonationById(id: string) {
 }
 
 export async function createDonation(data: any, tenantId: string) {
+  const { donorId, organizationId, ...rest } = data;
   return prisma.donation.create({
     data: {
-      ...data,
+      ...rest,
       tenantId,
+      donor: {
+        connect: { id: donorId },
+      },
+      organization: {
+        connect: { id: organizationId },
+      },
     },
   });
 }

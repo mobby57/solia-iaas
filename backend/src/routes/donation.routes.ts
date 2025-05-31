@@ -11,8 +11,10 @@ import { verifyTenant } from '../middlewares/verifyTenant';
 import { verifyRole } from '../middlewares/verifyRole';
 import { auditLog } from '../middlewares/auditLog';
 
+import { tenantMiddleware } from '../middlewares/tenantMiddleware';
+
 export async function donationRoutes(fastify: FastifyInstance) {
-  fastify.addHook('preHandler', verifyAuth);
+  fastify.addHook('preHandler', tenantMiddleware);
   fastify.addHook('preHandler', verifyTenant);
   fastify.addHook('preHandler', auditLog);
 

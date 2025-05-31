@@ -1,4 +1,4 @@
-import { prisma } from '../models/prisma';
+import prisma from '../lib/prisma';
 
 export async function getOrganizations(tenantId: string) {
   return prisma.organization.findMany({ where: { tenantId } });
@@ -24,6 +24,6 @@ export async function updateOrganization(id: string, data: any) {
   });
 }
 
-export async function deleteOrganization(id: string) {
+export async function deleteOrganization(id: string, tenantId: string) {
   return prisma.organization.delete({ where: { id } });
 }

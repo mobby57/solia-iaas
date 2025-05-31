@@ -40,8 +40,9 @@ export async function createOrganization(request: FastifyRequest, reply: Fastify
 export async function updateOrganization(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as any;
   const organizationData = request.body as any;
+  const tenantId = (request as any).tenantId;
   try {
-    const organization = await organizationService.updateOrganization(id, organizationData);
+    const organization = await organizationService.updateOrganization(id, organizationData, tenantId);
     if (!organization) {
       reply.status(404).send({ error: 'Organization not found' });
       return;
@@ -54,8 +55,9 @@ export async function updateOrganization(request: FastifyRequest, reply: Fastify
 
 export async function deleteOrganization(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as any;
+  const tenantId = (request as any).tenantId;
   try {
-    await organizationService.deleteOrganization(id);
+    await organizationService.deleteOrganization(id, tenantId);
     reply.status(204).send();
   } catch (error) {
     reply.status(500).send({ error: 'Failed to delete organization' });

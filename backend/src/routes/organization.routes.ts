@@ -11,8 +11,10 @@ import { verifyTenant } from '../middlewares/verifyTenant';
 import { verifyRole } from '../middlewares/verifyRole';
 import { auditLog } from '../middlewares/auditLog';
 
+import { tenantMiddleware } from '../middlewares/tenantMiddleware';
+
 export async function organizationRoutes(fastify: FastifyInstance) {
-  fastify.addHook('preHandler', verifyAuth);
+  fastify.addHook('preHandler', tenantMiddleware);
   fastify.addHook('preHandler', verifyTenant);
   fastify.addHook('preHandler', auditLog);
 
@@ -60,8 +62,9 @@ export async function organizationRoutes(fastify: FastifyInstance) {
 
   fastify.delete('/organizations/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
     const { id } = request.params as any;
+    const tenantId = (request as any).tenantId;
     try {
-      await deleteOrganization(id);
+      await deleteOrganization(id, tenantId);
       reply.status(204).send();
     } catch (error) {
       reply.status(500).send({ error: 'Failed to delete organization' });

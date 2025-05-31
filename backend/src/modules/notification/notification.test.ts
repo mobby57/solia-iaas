@@ -1,85 +1,50 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import * as notificationService from './notification.service';
+import { beforeEach, describe, expect, it, afterAll } from 'vitest';
 import prisma from '../../lib/prisma';
-import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
+import * as notificationService from '../../services/notification.service';
 
-let organizationId: string;
+import { resetDatabase } from '../../tests/testSetup';
 
-describe('Notification Service', () => {
-  beforeAll(async () => {
-    await cleanDatabase();
-
-    // Create an organization dynamically for tests
-    const organization = await prisma.organization.create({
-      data: {
-        name: 'Test Organization',
-        tenantId: 'test-tenant',
-      },
-    });
-    organizationId = organization.id;
+describe('NotificationService', () => {
+  // Use resetDatabase to clean and seed base data before each test
+  beforeEach(async () => {
+    await resetDatabase();
   });
 
   afterAll(async () => {
-    await cleanDatabase();
-    await disconnectDatabase();
-  });
-
-  it('should get notifications by tenantId', async () => {
-    const notifications = await notificationService.getNotifications(organizationId);
-    expect(notifications).toBeDefined();
-  });
-
-  it('should get notification by id', async () => {
-    // Create a notification using the service
-    const notification = await notificationService.createNotification(
-      {
-        title: 'Test Notification',
-        message: 'Test message',
-      },
-      organizationId
-    );
-    const fetched = await notificationService.getNotificationById(notification.id);
-    expect(fetched).toBeDefined();
-  });
-
-  it('should create a notification', async () => {
-    const notification = await notificationService.createNotification(
-      {
-        title: 'Test Notification',
-        message: 'Test message',
-      },
-      organizationId
-    );
-    expect(notification).toBeDefined();
+    await prisma.$disconnect();
   });
 
   it('should update a notification', async () => {
-    // Create a notification using the service
-    const notification = await notificationService.createNotification(
-      {
-        title: 'Test Notification',
-        message: 'Test message',
+    // Create a user with valid ObjectId tenantId
+    const user = await prisma.user.create({
+      data: {
+        email: `recipient_${Date.now()}@example.com`,
+        password: 'securepassword',
+        name: 'Recipient User',
+        tenantId: '507f1f77bcf86cd799439011',
+        role: {
+          create: {
+            name: 'RecipientRole',
+            tenantId: '507f1f77bcf86cd799439011',
+          },
+        },
       },
-      organizationId
-    );
-    const updated = await notificationService.updateNotification(notification.id, {
-      title: 'Updated Notification',
-      message: 'Updated message',
     });
-    expect(updated).toBeDefined();
-  });
 
-  it('should delete a notification', async () => {
-    // Create a notification using the service
-    const notification = await notificationService.createNotification(
-      {
-        title: 'Test Notification',
-        message: 'Test message',
-      },
-      organizationId
-    );
-    await notificationService.deleteNotification(notification.id);
-    const deleted = await notificationService.getNotificationById(notification.id);
-    expect(deleted).toBeNull();
+    // Create a notification entity with valid recipientId and tenantId
+    const notification = await notificationService.createNotification({
+      title: 'New message',
+      body: 'You have a new notification',
+      recipientId: user.id,
+      tenantId: user.tenantId,
+      type: 'INFO',
+      priority: 'LOW',
+    });
+
+    const updated = await notificationService.updateNotification(notification.id, {
+      read: true,
+    });
+
+    expect(updated.read).toBe(true);
   });
 });

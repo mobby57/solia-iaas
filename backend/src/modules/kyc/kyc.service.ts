@@ -1,15 +1,24 @@
 import prisma from '../../lib/prisma';
 
-export async function getKycs(tenantId: string) {
-  return prisma.kyc.findMany({ where: { tenantId } });
+export async function getKycFieldConfigsByRole(roleId: string, tenantId: string) {
+  return prisma.kYCFieldConfig.findMany({
+    where: {
+      roleId,
+      tenantId,
+    },
+  });
 }
 
-export async function getKycById(id: string) {
-  return prisma.kyc.findUnique({ where: { id } });
+export async function getKycFieldConfigs(tenantId: string) {
+  return prisma.kYCFieldConfig.findMany({ where: { tenantId } });
 }
 
-export async function createKyc(data: any, tenantId: string) {
-  return prisma.kyc.create({
+export async function getKycFieldConfigById(id: string) {
+  return prisma.kYCFieldConfig.findUnique({ where: { id } });
+}
+
+export async function createKycFieldConfig(data: any, tenantId: string) {
+  return prisma.kYCFieldConfig.create({
     data: {
       ...data,
       tenantId,
@@ -17,13 +26,13 @@ export async function createKyc(data: any, tenantId: string) {
   });
 }
 
-export async function updateKyc(id: string, data: any) {
-  return prisma.kyc.update({
+export async function updateKycFieldConfig(id: string, data: any) {
+  return prisma.kYCFieldConfig.update({
     where: { id },
     data,
   });
 }
 
-export async function deleteKyc(id: string) {
-  return prisma.kyc.delete({ where: { id } });
+export async function deleteKycFieldConfig(id: string) {
+  return prisma.kYCFieldConfig.delete({ where: { id } });
 }

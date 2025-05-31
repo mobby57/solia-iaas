@@ -1,4 +1,4 @@
-import { prisma } from '../models/prisma';
+import prisma from '../lib/prisma';
 
 export async function getMissions(tenantId: string) {
   return prisma.mission.findMany({ where: { tenantId } });

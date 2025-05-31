@@ -40,8 +40,9 @@ export async function createTask(request: FastifyRequest, reply: FastifyReply) {
 export async function updateTask(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as any;
   const taskData = request.body as any;
+  const tenantId = (request as any).tenantId;
   try {
-    const task = await taskService.updateTask(id, taskData);
+    const task = await taskService.updateTask(id, taskData, tenantId);
     if (!task) {
       reply.status(404).send({ error: 'Task not found' });
       return;
@@ -54,8 +55,9 @@ export async function updateTask(request: FastifyRequest, reply: FastifyReply) {
 
 export async function deleteTask(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as any;
+  const tenantId = (request as any).tenantId;
   try {
-    await taskService.deleteTask(id);
+    await taskService.deleteTask(id, tenantId);
     reply.status(204).send();
   } catch (error) {
     reply.status(500).send({ error: 'Failed to delete task' });
