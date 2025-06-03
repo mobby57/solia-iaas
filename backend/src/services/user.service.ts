@@ -1,12 +1,12 @@
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import bcrypt from 'bcrypt';
 
 export async function getUsers(tenantId: string) {
-  return prisma.user.findMany({ where: { tenantId } });
+  return prisma.user.findMany({ where: { tenantId }, cacheStrategy: { ttl: 60 } });
 }
 
 export async function getUserById(id: string) {
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({ where: { id }, cacheStrategy: { ttl: 60 } });
 }
 
 export async function createUser(userData: any, tenantId: string) {
@@ -16,6 +16,7 @@ export async function createUser(userData: any, tenantId: string) {
       ...userData,
       password: hashedPassword,
       tenantId,
+      role: userData.role,
     },
   });
 }

@@ -2,9 +2,9 @@ import { defineConfig } from 'vitest/config';
 import path from 'path';
 
 export default defineConfig({
-  root: './',
+  root: './', // inutile ici car c'est la valeur par défaut
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts'], // ou .spec.ts aussi ?
     globals: true,
     environment: 'node',
     testTimeout: 30000,

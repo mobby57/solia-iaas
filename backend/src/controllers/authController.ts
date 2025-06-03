@@ -1,95 +1,202 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import bcrypt from 'bcrypt';
-import { prisma } from '../models/prisma';
 import jwt from 'jsonwebtoken';
+import { prisma } from '../lib/prisma';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
 
-export async function signupController(data: { email: string; password: string; name: string; roleId: string; tenantId: string }, reply: FastifyReply) {
-  const { email, password, name, roleId, tenantId } = data;
-
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) {
-    return reply.status(400).send({ error: 'Email already registered' });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      name,
-      roleId,
-      tenantId,
-      createdBy: email,
-      updatedBy: email,
-    },
-  });
-
-  const token = jwt.sign({ sub: user.id, tenantId, roleId, email }, JWT_SECRET, { expiresIn: '7d' });
-
-  return reply.status(201).send({ token, user: { id: user.id, email: user.email, name: user.name, roleId: user.roleId } });
+interface SignupBody {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  roleId: string;
+  tenantId: string;
+  organizationName?: string;
+  siret?: string;
+  apeCode?: string;
+  phoneNumber?: string;
+  address?: object;
+  legalRepresentative?: object;
+  identityDoc?: string;
+  proofOfAddress?: string;
+  proofOfRegistration?: string;
+  kbisIfFreelancer?: string;
+  consentRGPD?: boolean;
+  agreedToCharter?: boolean;
 }
 
-export async function loginController(data: { email: string; password: string; tenantId: string }, reply: FastifyReply) {
-  const { email, password, tenantId } = data;
-
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return reply.status(401).send({ error: 'Invalid email or password' });
-  }
-
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) {
-    return reply.status(401).send({ error: 'Invalid email or password' });
-  }
-
-  const token = jwt.sign({ sub: user.id, tenantId, roleId: user.roleId, email }, JWT_SECRET, { expiresIn: '7d' });
-
-  return reply.send({ token, user: { id: user.id, email: user.email, name: user.name, roleId: user.roleId } });
+interface LoginBody {
+  email: string;
+  password: string;
+  tenantId: string;
 }
 
-// Password reset request - send reset token via email (mocked)
-export async function requestPasswordResetController(data: { email: string }, reply: FastifyReply) {
-  const { email } = data;
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return reply.status(400).send({ error: 'Email not found' });
-  }
-  // Generate a reset token (for demo, use a simple JWT)
-  const resetToken = jwt.sign({ sub: user.id, email }, JWT_SECRET, { expiresIn: '1h' });
-  // TODO: Send resetToken via email (mocked here)
-  console.log(`Password reset token for ${email}: ${resetToken}`);
-  return reply.send({ message: 'Password reset email sent' });
-}
+export async function signupController(request: FastifyRequest<{ Body: SignupBody }>, reply: FastifyReply) {
+  const {
+    email,
+    password,
+    firstName,
+    lastName,
+    roleId,
+    tenantId,
+    organizationName,
+    siret,
+    apeCode,
+    phoneNumber,
+    address,
+    legalRepresentative,
+    identityDoc,
+    proofOfAddress,
+    proofOfRegistration,
+    kbisIfFreelancer,
+    consentRGPD,
+    agreedToCharter,
+  } = request.body;
 
-// Password reset confirmation - update password using reset token
-export async function resetPasswordController(data: { token: string; newPassword: string }, reply: FastifyReply) {
-  const { token, newPassword } = data;
+  if (!email || !password || !firstName || !lastName || !roleId || !tenantId) {
+    return reply.status(400).send({ error: 'Missing required fields' });
+  }
+
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    const userId = decoded.sub;
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } });
-    return reply.send({ message: 'Password has been reset successfully' });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return reply.status(400).send({ error: 'User already exists' });
+    }
+
+    // Create organization if organizationName is provided
+    let organization = null;
+    if (organizationName) {
+      organization = await prisma.organization.create({
+        data: {
+          name: organizationName,
+          siret,
+          apeCode,
+          email,
+          phoneNumber,
+          address,
+          legalRepresentative,
+          proofOfRegistration,
+          tenantId,
+        },
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Compose full name
+    const name = `${firstName} ${lastName}`;
+
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+        organizationId: organization ? organization.id : null,
+        roleId,
+        tenantId,
+        kycData: {
+          create: {
+            consentRGPD,
+            agreedToCharter,
+            identityDoc,
+            proofOfAddress,
+            kbisIfFreelancer,
+            proofOfRegistration,
+          }
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        roleId: true,
+        tenantId: true,
+      },
+    });
+
+    // Create documents for identityDoc, proofOfAddress, proofOfRegistration, kbisIfFreelancer if provided
+    const documentsToCreate = [];
+    if (identityDoc) {
+      documentsToCreate.push({
+        name: 'Identity Document',
+        url: identityDoc,
+        organizationId: organization ? organization.id : null,
+        tenantId,
+      });
+    }
+    if (proofOfAddress) {
+      documentsToCreate.push({
+        name: 'Proof of Address',
+        url: proofOfAddress,
+        organizationId: organization ? organization.id : null,
+        tenantId,
+      });
+    }
+    if (proofOfRegistration) {
+      documentsToCreate.push({
+        name: 'Proof of Registration',
+        url: proofOfRegistration,
+        organizationId: organization ? organization.id : null,
+        tenantId,
+      });
+    }
+    if (kbisIfFreelancer) {
+      documentsToCreate.push({
+        name: 'Kbis (Freelancer)',
+        url: kbisIfFreelancer,
+        organizationId: organization ? organization.id : null,
+        tenantId,
+      });
+    }
+
+    for (const doc of documentsToCreate) {
+      await prisma.document.create({ data: doc });
+    }
+
+    const token = jwt.sign(
+      { sub: user.id, tenantId, roleId, email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return reply.status(201).send({ token, user });
   } catch (error) {
-    return reply.status(400).send({ error: 'Invalid or expired token' });
+    request.log.error(error);
+    console.error('AuthController error:', error);
+    return reply.status(500).send({ error: 'Internal server error' });
   }
 }
 
-// Password change - authenticated user changes password
-export async function changePasswordController(data: { userId: string; currentPassword: string; newPassword: string }, reply: FastifyReply) {
-  const { userId, currentPassword, newPassword } = data;
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    return reply.status(404).send({ error: 'User not found' });
+export async function loginController(request: FastifyRequest<{ Body: LoginBody }>, reply: FastifyReply) {
+  const { email, password, tenantId } = request.body;
+
+  if (!email || !password || !tenantId) {
+    return reply.status(400).send({ error: 'Missing required fields' });
   }
-  const validPassword = await bcrypt.compare(currentPassword, user.password);
-  if (!validPassword) {
-    return reply.status(400).send({ error: 'Current password is incorrect' });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return reply.status(401).send({ error: 'Invalid email or password' });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return reply.status(401).send({ error: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign(
+      { sub: user.id, tenantId, roleId: user.roleId, email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    const { password: _, ...userWithoutPassword } = user;
+
+    return reply.status(200).send({ token, user: userWithoutPassword });
+  } catch (error) {
+    request.log.error(error);
+    return reply.status(500).send({ error: 'Internal server error' });
   }
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } });
-  return reply.send({ message: 'Password changed successfully' });
 }

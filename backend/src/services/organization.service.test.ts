@@ -1,28 +1,32 @@
 import { describe, beforeAll, afterAll, test, expect } from 'vitest';
-import { cleanDatabase, disconnectDatabase, resetDatabase } from '../tests/testSetup';
+import prisma from '../lib/prisma';
 import * as organizationService from './organization.service';
 
 describe('Organization Service', () => {
+  // Use a valid ObjectId string for tenantId
+  const tenantId = '64b7f8a2e4b0c123456789ab';
+
   beforeAll(async () => {
-    await resetDatabase();
+    await prisma.organization.deleteMany();
   }, 30000);
 
   afterAll(async () => {
-    await disconnectDatabase();
+    await prisma.$disconnect();
   }, 30000);
 
   test('should create an organization', async () => {
     const orgData = {
       name: 'Test Organization',
-      tenantId: 'default-tenant',
+      tenantId: tenantId,
     };
     const organization = await organizationService.createOrganization(orgData, orgData.tenantId);
+    console.log('Created organization:', organization);
     expect(organization).toHaveProperty('id');
     expect(organization.name).toBe(orgData.name);
   }, 30000);
 
   test('should update an organization', async () => {
-    const org = await organizationService.createOrganization({ name: "Test Org", tenantId: "default-tenant" }, "default-tenant");
+    const org = await organizationService.createOrganization({ name: "Test Org", tenantId: tenantId }, tenantId);
     const updated = await organizationService.updateOrganization(org.id, { name: "Updated Org" });
     expect(updated).toHaveProperty('id');
     expect(updated.name).toBe('Updated Org');
@@ -31,7 +35,7 @@ describe('Organization Service', () => {
   test('should delete an organization', async () => {
     const orgData = {
       name: 'Organization to Delete',
-      tenantId: 'default-tenant',
+      tenantId: tenantId,
     };
     const organization = await organizationService.createOrganization(orgData, orgData.tenantId);
     const deletedOrg = await organizationService.deleteOrganization(organization.id, orgData.tenantId);
@@ -45,16 +49,16 @@ describe('Organization Service', () => {
   });
 
   test('should reject updating an organization with mismatched tenantId', async () => {
-    const org = await organizationService.createOrganization({ name: "Cross Tenant Org", tenantId: "default-tenant" }, "default-tenant");
+    const org = await organizationService.createOrganization({ name: "Cross Tenant Org", tenantId: tenantId }, tenantId);
     // Since updateOrganization does not take tenantId, just update normally
     const updated = await organizationService.updateOrganization(org.id, { name: "Hacker Org" });
     expect(updated.name).toBe("Hacker Org");
   });
 
   test('should reject deleting an organization with mismatched tenantId', async () => {
-    const org = await organizationService.createOrganization({ name: "Delete Cross Tenant Org", tenantId: "default-tenant" }, "default-tenant");
+    const org = await organizationService.createOrganization({ name: "Delete Cross Tenant Org", tenantId: tenantId }, tenantId);
     // Pass tenantId as second argument as per function signature
-    const deleted = await organizationService.deleteOrganization(org.id, "default-tenant");
+    const deleted = await organizationService.deleteOrganization(org.id, tenantId);
     expect(deleted.id).toBe(org.id);
   });
 });

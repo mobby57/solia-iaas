@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import prisma from '../../lib/prisma';
+import { prisma } from '../../lib/prisma';
 import { createNotification } from '../notification.service';
 
 describe('Notification Service', () => {
@@ -8,7 +8,12 @@ describe('Notification Service', () => {
   beforeAll(async () => {
     // Find or create role
     let role = await prisma.role.findUnique({
-      where: { name: 'RecipientRole' },
+      where: {
+        AND: [
+          { name: 'RecipientRole' },
+          { tenantId: '507f1f77bcf86cd799439011' }
+        ]
+      },
     });
     if (!role) {
       role = await prisma.role.create({
@@ -25,11 +30,12 @@ describe('Notification Service', () => {
     // Create a user with valid ObjectId tenantId and existing roleId
     user = await prisma.user.create({
       data: {
-        email: uniqueEmail,
+        email: u,
         password: 'securepassword',
         name: 'Recipient User',
         tenantId: '507f1f77bcf86cd799439011',
         roleId: role.id,
+        role: 'RecipientRole', // Added role field to fix missing argument error
       },
     });
   }, 30000);

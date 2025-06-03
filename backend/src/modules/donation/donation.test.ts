@@ -36,10 +36,7 @@ describe('Donation Service', () => {
       data: {
         email: `donor+${Date.now()}@example.com`,
         password: 'password123',
-        name: 'Test Donor',
-        role: {
-          connect: { name: 'USER' }
-        },
+        role: 'DONOR',
         tenantId,
       },
     });
@@ -62,7 +59,7 @@ describe('Donation Service', () => {
         amount: 100,
         date: new Date(),
         tenantId,
-        donor: {
+        user: {
           connect: { id: donorId },
         },
         organization: {
@@ -79,8 +76,8 @@ describe('Donation Service', () => {
       {
         amount: 100,
         date: new Date(),
-        donorId,
-        organizationId,
+      userId: donorId,
+      organizationId,
       },
       tenantId
     );
@@ -91,7 +88,7 @@ describe('Donation Service', () => {
     const created = await donationService.createDonation({
       amount: 100,
       date: new Date(),
-      donorId,
+      userId: donorId,
       organizationId,
     }, tenantId);
     console.log('Update Donation Test - created.id:', created.id);
@@ -109,9 +106,9 @@ describe('Donation Service', () => {
         amount: 100,
         date: new Date(),
         tenantId,
-        donor: {
-          connect: { id: donorId },
-        },
+      user: {
+        connect: { id: donorId },
+      },
         organization: {
           connect: { id: organizationId },
         },

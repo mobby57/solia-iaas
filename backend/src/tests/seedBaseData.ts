@@ -1,9 +1,10 @@
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
+
 import { ObjectId } from 'mongodb';
 
 export async function seedBaseData() {
   // Ensure base organizations exist
-  const orgCount = await prisma.organization.count();
+  const orgCount = await prisma.organization.count({});
   if (orgCount === 0) {
     await prisma.organization.create({
       data: {

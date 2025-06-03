@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 
 import { seedBaseData } from './seedBaseData';
 
@@ -10,7 +10,7 @@ export async function resetTestDatabase() {
   await prisma.comment.deleteMany();
 
   // Delete KYCFieldConfig before roles to avoid FK constraint
-  await prisma.kYCFieldConfig.deleteMany();
+  // await prisma.kYCFieldConfig.deleteMany(); // Commented out because kYCFieldConfig model does not exist
 
   // Delete users before roles
   await prisma.user.deleteMany();

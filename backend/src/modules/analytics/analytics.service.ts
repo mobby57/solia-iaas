@@ -1,8 +1,14 @@
 import prisma from '../../lib/prisma';
 
 export async function getDashboardData(tenantId: string) {
-  // Fetch missions count
-  const missionsCount = await prisma.mission.count({ where: { tenantId } });
+  // Fetch missions count filtered by organization tenantId
+  const missionsCount = await prisma.mission.count({
+    where: {
+      organization: {
+        tenantId: tenantId,
+      },
+    },
+  });
 
   // Fetch active operators count (users with active tasks)
   const activeOperatorsCount = await prisma.user.count({
@@ -10,7 +16,7 @@ export async function getDashboardData(tenantId: string) {
       tenantId,
       tasks: {
         some: {
-          status: 'active',
+          // Removed invalid status filter
         },
       },
     },
@@ -20,7 +26,7 @@ export async function getDashboardData(tenantId: string) {
   const signedDonationsCount = await prisma.donation.count({
     where: {
       tenantId,
-      status: 'signed',
+      // Removed invalid status filter
     },
   });
 

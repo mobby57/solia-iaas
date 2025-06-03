@@ -13,7 +13,7 @@ export async function login(email: string, password: string) {
         id: true,
         email: true,
         password: true,
-        roleId: true,
+        role: true,
         tenantId: true,
       },
     });
@@ -31,7 +31,7 @@ export async function login(email: string, password: string) {
       {
         sub: user.id,
         tenantId: user.tenantId,
-        role: user.roleId,
+        role: user.role,
         email: user.email,
       },
       JWT_SECRET,

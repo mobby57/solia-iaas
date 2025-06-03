@@ -55,14 +55,14 @@ solia/
 ## ✨ Fonctionnalités principales
 
 | Module                | Fonctionnalité                                                                 |
-|----------------------|--------------------------------------------------------------------------------|
-| Authentification      | Inscription, login, multi-tenant, rôle utilisateur                            |
+|-----------------------|--------------------------------------------------------------------------------|
+| Authentification      | Inscription, login, multi-tenant, rôle utilisateur                              |
 | Utilisateurs          | CRUD utilisateurs, KYC dynamique, rôles personnalisés                          |
-| Missions              | Création/gestion de missions (terrain/téléphone) par opérateur                |
-| Tâches (Taskschul)    | Planning, affectation, rappels automatiques                                   |
-| Dons (Donations)      | Historique, validation, intégration moyens de paiement                        |
+| Missions              | Création/gestion de missions (terrain/téléphone) par opérateur                 |
+| Tâches (Taskschul)    | Planning, affectation, rappels automatiques                                    |
+| Dons (Donations)      | Historique, validation, intégration moyens de paiement                         |
 | Système de notification | SMS, email, webhook                                                           |
-| IA métier             | Suggestions de tâches, scoring d’impact, audit automatique                    |
+| IA métier             | Suggestions de tâches, scoring d’impact, audit automatique                     |
 | Audit / Logs          | Traçabilité complète, conformité RGPD/KYC                                     |
 | Tags / Commentaires   | Système polymorphe, suivi collaboratif                                         |
 

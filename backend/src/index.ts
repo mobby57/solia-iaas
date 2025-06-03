@@ -2,7 +2,6 @@ import Fastify from 'fastify';
 import dotenv from 'dotenv';
 dotenv.config();
 
-
 import rateLimit from '@fastify/rate-limit';
 
 import swaggerPlugin from './plugins/swagger';
@@ -14,15 +13,15 @@ import { taskRoutes } from './routes/task.routes';
 import queueUIRouter from './queues/queueUI';
 import { healthcheckRoutes } from './routes/healthcheck.routes';
 
-const app = Fastify();
+export function buildApp() {
+  const app = Fastify();
 
-async function start() {
   app.register(rateLimit, {
     max: 100,
     timeWindow: '1 minute',
   });
 
-  await app.register(swaggerPlugin);
+  app.register(swaggerPlugin);
 
   // Add root route for GET /
   app.get('/', async (request, reply) => {
@@ -40,6 +39,12 @@ async function start() {
   app.register(taskRoutes);
   app.register(queueUIRouter);
   app.register(healthcheckRoutes);
+
+  return app;
+}
+
+export async function start() {
+  const app = buildApp();
 
   try {
     await app.listen({ port: 3000, host: '0.0.0.0' });

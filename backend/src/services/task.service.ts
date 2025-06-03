@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import { ObjectId } from 'mongodb';
 import { Task } from '@prisma/client';
 
@@ -10,24 +10,20 @@ function validateObjectId(id: string): string {
 }
 
 export async function getTasks(tenantId: string) {
-  const validTenantId = validateObjectId(tenantId);
-  return prisma.task.findMany({ where: { tenantId: validTenantId } });
+  return prisma.task.findMany();
 }
 
 export async function getTaskById(id: string, tenantId: string) {
   const validId = validateObjectId(id);
-  const validTenantId = validateObjectId(tenantId);
-  return prisma.task.findFirst({ where: { id: validId, tenantId: validTenantId } });
+  return prisma.task.findFirst({ where: { id: validId } });
 }
 
 export async function createTask(data: any, tenantId: string) {
-  const validTenantId = validateObjectId(tenantId);
   const validUserId = data.userId ? validateObjectId(data.userId) : undefined;
 
   return prisma.task.create({
     data: {
       ...data,
-      tenantId: validTenantId,
       ...(validUserId && { userId: validUserId }),
     },
   });
@@ -39,32 +35,30 @@ export async function updateTask(
   tenantId: string
 ) {
   const validId = validateObjectId(id);
-  const validTenantId = validateObjectId(tenantId);
   const validUserId = data.userId ? validateObjectId(data.userId) : undefined;
 
   const updated = await prisma.task.updateMany({
-    where: { id: validId, tenantId: validTenantId },
+    where: { id: validId },
     data: { ...data, ...(validUserId && { userId: validUserId }) },
   });
 
   if (updated.count === 0) {
-    throw new Error('No task found for update with the given id and tenantId');
+    throw new Error('No task found for update with the given id');
   }
 
   // Return the updated task
-  return prisma.task.findFirst({ where: { id: validId, tenantId: validTenantId } });
+  return prisma.task.findFirst({ where: { id: validId } });
 }
 
 export async function deleteTask(id: string, tenantId: string) {
   const validId = validateObjectId(id);
-  const validTenantId = validateObjectId(tenantId);
 
   const deleted = await prisma.task.deleteMany({
-    where: { id: validId, tenantId: validTenantId },
+    where: { id: validId },
   });
 
   if (deleted.count === 0) {
-    throw new Error('No task found for delete with the given id and tenantId');
+    throw new Error('No task found for delete with the given id');
   }
 
   return deleted;

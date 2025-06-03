@@ -6,6 +6,18 @@ metadata:
 pipeline:
   variables:
     - HTACCESS
+  stages:
+    - name: Test
+      jobs:
+        - job: RunTests
+          pool:
+            vmImage: 'ubuntu-latest'
+          steps:
+            - script: |
+                npm install
+                npm test
+              workingDirectory: backend
+              displayName: 'Install dependencies and run tests'
 hooks:
   preprovision:
     posix:

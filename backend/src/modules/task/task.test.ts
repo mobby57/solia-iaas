@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import * as taskService from './task.service';
-import prisma from '../../lib/prisma';
+import {prisma} from '../../lib/prisma';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
 
 let validTenantId: string;

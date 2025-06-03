@@ -20,7 +20,7 @@ export async function organizationRoutes(fastify: FastifyInstance) {
 
   fastify.get('/organizations', async (request, reply) => {
     const tenantId = (request as any).tenantId;
-    const organizations = await getOrganizations(tenantId);
+    const organizations = await getOrganizations({ tenantId });
     reply.send(organizations);
   });
 

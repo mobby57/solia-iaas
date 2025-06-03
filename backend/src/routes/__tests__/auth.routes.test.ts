@@ -1,27 +1,26 @@
+
 import Fastify from 'fastify';
-import { vi, describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { signupController, loginController } from '../../controllers/authController';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { authRoutes } from '../auth';
+import { prisma } from '../../lib/prisma';
 
 describe('Auth Routes', () => {
   const fastify = Fastify();
 
   beforeAll(async () => {
-    // Mock routes for signup and login
-    fastify.post('/auth/signup', async (request, reply) => {
-      const data = request.body as any;
-      return signupController(data, reply);
-    });
-
-    fastify.post('/auth/login', async (request, reply) => {
-      const data = request.body as any;
-      return loginController(data, reply);
-    });
-
+    fastify.register(authRoutes);
     await fastify.ready();
   });
 
   afterAll(async () => {
     await fastify.close();
+    await prisma.$disconnect();
+  });
+
+  beforeEach(async () => {
+    // Clear users collection or reset test database here if possible
+    // For example, if you have a resetTestDatabase function:
+    // await resetTestDatabase();
   });
 
   it('POST /auth/signup should create a new user and return token', async () => {
@@ -31,9 +30,10 @@ describe('Auth Routes', () => {
       payload: {
         email: 'testuser@example.com',
         password: 'password123',
-        name: 'Test User',
-        roleId: 'test-role',
-        tenantId: 'test-tenant',
+        firstName: 'Test',
+        lastName: 'User',
+        roleId: 'OPERATOR',
+        tenantId: 'tenant-france',
       },
     });
 
@@ -52,9 +52,10 @@ describe('Auth Routes', () => {
       payload: {
         email: 'loginuser@example.com',
         password: 'password123',
-        name: 'Login User',
-        roleId: 'test-role',
-        tenantId: 'test-tenant',
+        firstName: 'Login',
+        lastName: 'User',
+        roleId: 'OPERATOR',
+        tenantId: 'tenant-france',
       },
     });
 
@@ -65,7 +66,7 @@ describe('Auth Routes', () => {
       payload: {
         email: 'loginuser@example.com',
         password: 'password123',
-        tenantId: 'test-tenant',
+        tenantId: 'tenant-france',
       },
     });
 
@@ -74,5 +75,55 @@ describe('Auth Routes', () => {
     expect(body).toHaveProperty('token');
     expect(body).toHaveProperty('user');
     expect(body.user.email).toBe('loginuser@example.com');
+  });
+
+  it('POST /auth/signup should reject with 400 for missing fields', async () => {
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/auth/signup',
+      payload: {
+        email: '',
+        password: '',
+        firstName: '',
+        lastName: '',
+        roleId: '',
+        tenantId: '',
+      },
+    });
+
+    expect(response.statusCode).toBe(400);
+    const body = JSON.parse(response.body);
+    expect(body).toHaveProperty('error');
+  });
+
+  it('POST /auth/login should reject with 401 for invalid credentials', async () => {
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: {
+        email: 'nonexistent@example.com',
+        password: 'wrongpassword',
+        tenantId: 'tenant-france',
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+    const body = JSON.parse(response.body);
+    expect(body).toHaveProperty('error');
+  });
+
+  it('POST /auth/login should reject with 401 for missing tenantId', async () => {
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: {
+        email: 'loginuser@example.com',
+        password: 'password123',
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+    const body = JSON.parse(response.body);
+    expect(body).toHaveProperty('error');
   });
 });

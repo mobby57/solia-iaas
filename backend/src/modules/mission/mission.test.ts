@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
-import prisma from '../../lib/prisma';
+import {prisma} from '../../lib/prisma';
 import * as missionService from './mission.service';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
 
@@ -15,7 +15,6 @@ describe('Mission Service', () => {
     const organization = await prisma.organization.create({
       data: {
         name: 'Test Organization',
-        tenantId,
       },
     });
     organizationId = organization.id;
@@ -26,8 +25,8 @@ describe('Mission Service', () => {
     await disconnectDatabase();
   }, 30000);
 
-  it('should get missions by tenantId', async () => {
-    const missions = await missionService.getMissions(tenantId);
+  it('should get missions', async () => {
+    const missions = await missionService.getMissions();
     expect(missions).toBeDefined();
   }, 30000);
 
@@ -35,8 +34,6 @@ describe('Mission Service', () => {
     const created = await prisma.mission.create({
       data: {
         name: 'Test Mission',
-        tenantId,
-        type: 'Test Type',
         startDate: new Date('2025-06-01T00:00:00.000Z'),
         endDate: new Date('2025-07-01T00:00:00.000Z'),
         organization: {
@@ -51,13 +48,12 @@ describe('Mission Service', () => {
   it('should create a mission', async () => {
     const mission = await missionService.createMission({
       name: 'Test Mission',
-      type: 'Test Type',
       startDate: new Date('2025-06-01T00:00:00.000Z'),
       endDate: new Date('2025-07-01T00:00:00.000Z'),
       organization: {
         connect: { id: organizationId },
       },
-    }, tenantId);
+    });
     expect(mission).toBeDefined();
   }, 30000);
 
@@ -65,8 +61,6 @@ describe('Mission Service', () => {
     const created = await prisma.mission.create({
       data: {
         name: 'Test Mission',
-        tenantId,
-        type: 'Test Type',
         startDate: new Date('2025-06-01T00:00:00.000Z'),
         endDate: new Date('2025-07-01T00:00:00.000Z'),
         organization: {
@@ -82,8 +76,6 @@ describe('Mission Service', () => {
     const created = await prisma.mission.create({
       data: {
         name: 'Test Mission',
-        tenantId,
-        type: 'Test Type',
         startDate: new Date('2025-06-01T00:00:00.000Z'),
         endDate: new Date('2025-07-01T00:00:00.000Z'),
         organization: {

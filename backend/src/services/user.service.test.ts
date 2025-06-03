@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { updateUser, createUser } from './user.service';
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import { resetTestDatabase, disconnectDatabase } from '../tests/resetTestDatabase';
 

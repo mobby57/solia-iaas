@@ -1,6 +1,5 @@
-// solia/backend/src/tests/testSetup.ts
-
-import prisma from '../lib/prisma'
+import { prisma } from '../lib/prisma';
+import { seedAll } from '../../prisma/seeds/seedAll';
 
 export async function cleanDatabase() {
   const collections = await prisma.$runCommandRaw({
@@ -24,4 +23,5 @@ export async function disconnectDatabase() {
 
 export async function resetDatabase() {
   await cleanDatabase();
+  await seedAll();
 }

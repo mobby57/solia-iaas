@@ -1,18 +1,17 @@
-import prisma from '../lib/prisma';
+import {prisma} from '../lib/prisma';
 
-export async function getMissions(tenantId: string) {
-  return prisma.mission.findMany({ where: { tenantId } });
+export async function getMissions() {
+  return prisma.mission.findMany();
 }
 
 export async function getMissionById(id: string) {
   return prisma.mission.findUnique({ where: { id } });
 }
 
-export async function createMission(data: any, tenantId: string) {
+export async function createMission(data: any) {
   return prisma.mission.create({
     data: {
       ...data,
-      tenantId,
     },
   });
 }

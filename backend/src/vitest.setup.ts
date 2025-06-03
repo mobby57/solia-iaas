@@ -1,9 +1,9 @@
 import * as dotenv from 'dotenv';
-import { seedBaseData } from '../prisma/seeds/seedBaseData';
+import { resetDatabase } from './tests/testSetup';
 import { beforeAll } from 'vitest';
 
 dotenv.config({ path: '.env' });
 
 beforeAll(async () => {
-  await seedBaseData();
+  await resetDatabase();
 });

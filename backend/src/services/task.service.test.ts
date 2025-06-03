@@ -4,10 +4,36 @@ import { createTask, updateTask } from './task.service';
 
 describe('Task Service', () => {
   let testTask: any;
-  const tenantId = 'default-tenant';
+  let testUser: any;
+  let testMission: any;
+
+  const tenantId = '64b7f8a2e4b0c123456789ab';
 
   beforeAll(async () => {
-    await prisma.task.deleteMany(); // clean slate
+    await prisma.task.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.mission.deleteMany();
+
+    // Crée un user de test
+    testUser = await prisma.user.create({
+      data: {
+        email: 'testuser@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        tenantId,
+        role: 'operator', // ou autre rôle valide
+      },
+    });
+
+    // Crée une mission de test
+    testMission = await prisma.mission.create({
+      data: {
+        name: 'Test Mission',
+        startDate: new Date(),
+        endDate: new Date(),
+        tenantId,
+      },
+    });
   }, 30000);
 
   it('should create and update a task with tenantId', async () => {
@@ -15,13 +41,14 @@ describe('Task Service', () => {
       {
         status: 'pending',
         date: new Date(),
-        userId: 'user-id-placeholder', // replace with real user ID if required
-        missionId: 'mission-id-placeholder', // replace with real mission ID if required
+        userId: testUser.id,
+        missionId: testMission.id,
       },
       tenantId
     );
 
     expect(testTask).toBeDefined();
+    expect(testTask.tenantId).toBe(tenantId);
 
     const updated = await updateTask(
       testTask.id,
@@ -41,8 +68,8 @@ describe('Task Service', () => {
       {
         status: 'pending',
         date: new Date(),
-        userId: 'user-id-placeholder',
-        missionId: 'mission-id-placeholder',
+        userId: testUser.id,
+        missionId: testMission.id,
       },
       ''
     )).rejects.toThrow();
@@ -53,8 +80,8 @@ describe('Task Service', () => {
       {
         status: 'pending',
         date: new Date(),
-        userId: 'user-id-placeholder',
-        missionId: 'mission-id-placeholder',
+        userId: testUser.id,
+        missionId: testMission.id,
       },
       tenantId
     );

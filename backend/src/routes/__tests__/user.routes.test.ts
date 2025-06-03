@@ -30,7 +30,7 @@ describe('User Routes', () => {
       method: 'GET',
       url: '/users',
       headers: {
-        'x-tenant-id': '507f1f77bcf86cd799439011' // valid 24-char hex string
+        'x-tenant-id': 'default-tenant' // updated to match seed data tenantId
       }
     });
 

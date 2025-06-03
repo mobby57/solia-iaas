@@ -5,7 +5,7 @@ import { seedDonations } from './seedDonations';
 import { seedDocuments } from './seedDocuments';
 import { seedTagsAndComments } from './seedTagsAndComments';
 
-async function main() {
+export async function seedAll() {
   try {
     await seedBaseData();
     await seedUsers();
@@ -13,11 +13,9 @@ async function main() {
     await seedDonations();
     await seedDocuments();
     await seedTagsAndComments();
-    // Add calls to other seed files as they are created
+    console.log('Seeding completed successfully.');
   } catch (error) {
     console.error('Error during seeding:', error);
-    process.exit(1);
+    throw error;
   }
 }
-
-main();
