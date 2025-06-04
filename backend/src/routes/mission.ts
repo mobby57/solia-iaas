@@ -1,5 +1,5 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { PrismaClient } from '@prisma/client';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { verifyAuth } from '../middlewares/verifyAuth';
 import { verifyTenant } from '../middlewares/verifyTenant';
 
@@ -9,7 +9,7 @@ interface MissionBody {
   name: string;
   type: string;
   startDate: string; // ISO string
-  endDate: string;   // ISO string
+  endDate: string; // ISO string
   organizationId: string;
   tenantId: string;
 }
@@ -50,7 +50,8 @@ export async function missionRoutes(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { name, type, startDate, endDate, organizationId, tenantId } = (request.body as MissionBody);
+      const { name, type, startDate, endDate, organizationId, tenantId } =
+        request.body as MissionBody;
 
       try {
         const mission = await prisma.mission.create({
@@ -69,6 +70,6 @@ export async function missionRoutes(fastify: FastifyInstance) {
         request.log.error(error);
         return reply.code(500).send({ error: 'Failed to create mission' });
       }
-    }
+    },
   );
 }

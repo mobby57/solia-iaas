@@ -8,8 +8,8 @@ import {
 } from '../organization.service';
 
 describe('Organization Service', () => {
-  let tenantId1 = 'tenant1';
-  let tenantId2 = 'tenant2';
+  const tenantId1 = 'tenant1';
+  const tenantId2 = 'tenant2';
   let orgId: string;
 
   beforeAll(async () => {
@@ -50,27 +50,27 @@ describe('Organization Service', () => {
 
     it('should throw error for valid id but wrong tenantId', async () => {
       await expect(updateOrganization(orgId, { name: 'Fail Update' }, tenantId2)).rejects.toThrow(
-        'No organization found for update with the given id and tenant'
+        'No organization found for update with the given id and tenant',
       );
     });
 
     it('should throw error for invalid id', async () => {
-      await expect(updateOrganization('000000000000000000000000', { name: 'Fail Update' }, tenantId1)).rejects.toThrow(
-        'No organization found for update with the given id and tenant'
-      );
+      await expect(
+        updateOrganization('000000000000000000000000', { name: 'Fail Update' }, tenantId1),
+      ).rejects.toThrow('No organization found for update with the given id and tenant');
     });
   });
 
   describe('deleteOrganization', () => {
     it('should throw error for valid id but wrong tenantId', async () => {
       await expect(deleteOrganization(orgId, tenantId2)).rejects.toThrow(
-        'No organization found for delete with the given id and tenant'
+        'No organization found for delete with the given id and tenant',
       );
     });
 
     it('should throw error for invalid id', async () => {
       await expect(deleteOrganization('000000000000000000000000', tenantId1)).rejects.toThrow(
-        'No organization found for delete with the given id and tenant'
+        'No organization found for delete with the given id and tenant',
       );
     });
 

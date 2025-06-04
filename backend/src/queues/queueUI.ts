@@ -1,11 +1,8 @@
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 
-async function queueUIRouter(
-  fastify: FastifyInstance,
-  opts: FastifyPluginOptions
-) {
-  fastify.get('/queue', async (request: FastifyRequest, reply: FastifyReply) => {
+async function queueUIRouter(fastify: FastifyInstance, _opts: FastifyPluginOptions) {
+  fastify.get('/queue', async (_request: FastifyRequest, _reply: FastifyReply) => {
     return { status: 'ok' };
   });
 }

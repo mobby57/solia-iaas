@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { getDashboardData } from './analytics.service';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
+import { getDashboardData } from './analytics.service';
 
 const tenantId = '507f1f77bcf86cd799439011';
 

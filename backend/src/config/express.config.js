@@ -1,11 +1,11 @@
-import express from "express";
+import express from 'express';
 
-import middlewareConfig from "./middleware.config.js";
+import middlewareConfig from './middleware.config.js';
 
 const ExpressConfig = () => {
   const app = express();
   app.use(express.json());
-  app.set("trust proxy", true);
+  app.set('trust proxy', true);
 
   middlewareConfig(app);
 

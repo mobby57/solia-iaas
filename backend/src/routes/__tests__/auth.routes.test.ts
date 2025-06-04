@@ -1,8 +1,7 @@
-
 import Fastify from 'fastify';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { authRoutes } from '../auth';
 import { prisma } from '../../lib/prisma';
+import { authRoutes } from '../auth';
 
 describe('Auth Routes', () => {
   const fastify = Fastify();

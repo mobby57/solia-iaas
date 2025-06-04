@@ -1,4 +1,10 @@
 import { FastifyInstance } from 'fastify';
+import { auditLog } from '../middlewares/auditLog';
+import { tenantMiddleware } from '../middlewares/tenantMiddleware';
+import { verifyAuth } from '../middlewares/verifyAuth';
+import { verifyRole } from '../middlewares/verifyRole';
+import { verifyTenant } from '../middlewares/verifyTenant';
+
 import {
   getDocuments,
   getDocumentById,
@@ -6,12 +12,6 @@ import {
   updateDocument,
   deleteDocument,
 } from '../services/document.service';
-import { verifyAuth } from '../middlewares/verifyAuth';
-import { verifyTenant } from '../middlewares/verifyTenant';
-import { verifyRole } from '../middlewares/verifyRole';
-import { auditLog } from '../middlewares/auditLog';
-
-import { tenantMiddleware } from '../middlewares/tenantMiddleware';
 
 export async function documentRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', tenantMiddleware);
@@ -52,9 +52,13 @@ export async function documentRoutes(fastify: FastifyInstance) {
     reply.send(document);
   });
 
-  fastify.delete('/documents/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
-    const { id } = request.params as any;
-    await deleteDocument(id);
-    reply.status(204).send();
-  });
+  fastify.delete(
+    '/documents/:id',
+    { preHandler: verifyRole(['ADMIN']) },
+    async (request, reply) => {
+      const { id } = request.params as any;
+      await deleteDocument(id);
+      reply.status(204).send();
+    },
+  );
 }

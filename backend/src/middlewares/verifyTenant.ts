@@ -1,6 +1,9 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-export async function verifyTenant(request: FastifyRequest & { tenantId?: string }, reply: FastifyReply) {
+export async function verifyTenant(
+  request: FastifyRequest & { tenantId?: string },
+  reply: FastifyReply,
+) {
   const tenantId = request.headers['x-tenant-id'] as string | undefined;
   if (!tenantId) {
     reply.status(400).send({ error: 'Missing tenant ID' });

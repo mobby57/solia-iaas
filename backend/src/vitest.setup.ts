@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
-import { resetDatabase } from './tests/testSetup';
 import { beforeAll } from 'vitest';
+import { resetDatabase } from './tests/testSetup';
 
 dotenv.config({ path: '.env' });
 

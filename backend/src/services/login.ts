@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_here";
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
 
 export async function login(email: string, password: string) {
   try {
@@ -19,12 +19,12 @@ export async function login(email: string, password: string) {
     });
 
     if (!user) {
-      throw new Error("Invalid email or password");
+      throw new Error('Invalid email or password');
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new Error("Invalid email or password");
+      throw new Error('Invalid email or password');
     }
 
     const token = jwt.sign(
@@ -35,7 +35,7 @@ export async function login(email: string, password: string) {
         email: user.email,
       },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: '1h' },
     );
 
     // Remove password before returning user
@@ -43,7 +43,7 @@ export async function login(email: string, password: string) {
 
     return { user: userWithoutPassword, token };
   } catch (error) {
-    console.error("Error in login:", error);
+    console.error('Error in login:', error);
     throw error;
   }
 }

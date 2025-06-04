@@ -9,10 +9,7 @@ describe('Notification Service', () => {
     // Find or create role
     let role = await prisma.role.findUnique({
       where: {
-        AND: [
-          { name: 'RecipientRole' },
-          { tenantId: '507f1f77bcf86cd799439011' }
-        ]
+        AND: [{ name: 'RecipientRole' }, { tenantId: '507f1f77bcf86cd799439011' }],
       },
     });
     if (!role) {

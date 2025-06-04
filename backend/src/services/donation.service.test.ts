@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach, afterAll } from 'vitest';
 import prisma from '../lib/prisma';
-import { createDonation } from './donation.service';
 import { resetTestDatabase } from '../tests/resetTestDatabase';
+import { createDonation } from './donation.service';
 
 describe('Donation Service', () => {
   let testUser: any;
@@ -60,7 +60,7 @@ describe('Donation Service', () => {
         donorId: testUser.id,
         organizationId: testOrganization.id,
       },
-      tenantId
+      tenantId,
     );
 
     expect(donation).toHaveProperty('id');
@@ -75,7 +75,7 @@ describe('Donation Service', () => {
         donorId: testUser.id,
         organizationId: testOrganization.id,
       },
-      tenantId
+      tenantId,
     );
 
     const updated = await prisma.donation.update({
@@ -96,7 +96,7 @@ describe('Donation Service', () => {
         donorId: testUser.id,
         organizationId: testOrganization.id,
       },
-      tenantId
+      tenantId,
     );
 
     const deleted = await prisma.donation.delete({
@@ -107,15 +107,17 @@ describe('Donation Service', () => {
   }, 30000);
 
   it('should reject creating a donation without tenantId', async () => {
-    await expect(createDonation(
-      {
-        amount: 10,
-        date: new Date(),
-        donorId: testUser.id,
-        organizationId: testOrganization.id,
-      },
-      ''
-    )).rejects.toThrow();
+    await expect(
+      createDonation(
+        {
+          amount: 10,
+          date: new Date(),
+          donorId: testUser.id,
+          organizationId: testOrganization.id,
+        },
+        '',
+      ),
+    ).rejects.toThrow();
   });
 
   it('should reject creating a donation with cross-tenant user or organization', async () => {
@@ -148,26 +150,29 @@ describe('Donation Service', () => {
     });
 
     // Attempt to create donation with mismatched tenant user
-    await expect(createDonation(
-      {
-        amount: 20,
-        date: new Date(),
-        donorId: otherUser.id,
-        organizationId: testOrganization.id,
-      },
-      tenantId
-    )).rejects.toThrow();
+    await expect(
+      createDonation(
+        {
+          amount: 20,
+          date: new Date(),
+          donorId: otherUser.id,
+          organizationId: testOrganization.id,
+        },
+        tenantId,
+      ),
+    ).rejects.toThrow();
 
     // Attempt to create donation with mismatched tenant organization
-    await expect(createDonation(
-      {
-        amount: 20,
-        date: new Date(),
-        donorId: testUser.id,
-        organizationId: otherOrganization.id,
-      },
-      tenantId
-    )).rejects.toThrow();
+    await expect(
+      createDonation(
+        {
+          amount: 20,
+          date: new Date(),
+          donorId: testUser.id,
+          organizationId: otherOrganization.id,
+        },
+        tenantId,
+      ),
+    ).rejects.toThrow();
   });
-
 });

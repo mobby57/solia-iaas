@@ -1,13 +1,7 @@
 import { FastifyInstance } from 'fastify';
-import {
-  getUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-} from './user.controller';
 import { verifyAuth } from '../../middlewares/verifyAuth';
 import { verifyRole } from '../../middlewares/verifyRole';
+import { getUsers, getUserById, createUser, updateUser, deleteUser } from './user.controller';
 
 export async function userRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

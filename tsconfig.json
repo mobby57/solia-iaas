@@ -1,14 +1,20 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "commonjs",
-    "lib": ["ES2015", "DOM"],
-    "strict": true,
-    "esModuleInterop": true,
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["node", "jest", "vitest/globals"]
   },
-  "include": ["backend/**/*", "apps/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["backend/src", "solia/backend/src"]
 }

@@ -1,5 +1,5 @@
-import { prisma, Prisma } from '../lib/prisma';
 import { ObjectId } from 'bson';
+import { prisma, Prisma } from '../lib/prisma';
 
 async function createDefaultOrganization() {
   const data: Prisma.OrganizationCreateInput = {

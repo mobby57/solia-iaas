@@ -1,4 +1,6 @@
 import { FastifyInstance } from 'fastify';
+import { verifyAuth } from '../../middlewares/verifyAuth';
+import { verifyRole } from '../../middlewares/verifyRole';
 import {
   getDonations,
   getDonationById,
@@ -6,8 +8,6 @@ import {
   updateDonation,
   deleteDonation,
 } from './donation.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function donationRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

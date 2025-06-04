@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
-import {prisma} from '../../lib/prisma';
-import * as missionService from './mission.service';
+import { prisma } from '../../lib/prisma';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
+import * as missionService from './mission.service';
 
-let tenantId = '507f1f77bcf86cd799439011';
+const tenantId = '507f1f77bcf86cd799439011';
 
 describe('Mission Service', () => {
   let organizationId: string;

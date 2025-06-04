@@ -1,7 +1,7 @@
-import fp from 'fastify-plugin';
-import { FastifyInstance } from 'fastify';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import { FastifyInstance } from 'fastify';
+import fp from 'fastify-plugin';
 
 export default fp(async function (fastify: FastifyInstance) {
   await fastify.register(swagger, {
@@ -9,7 +9,8 @@ export default fp(async function (fastify: FastifyInstance) {
       openapi: '3.0.3',
       info: {
         title: 'Solia IaaS API',
-        description: 'API pour la gestion du fundraising (multi-tenant, utilisateurs, missions, dons, etc.)',
+        description:
+          'API pour la gestion du fundraising (multi-tenant, utilisateurs, missions, dons, etc.)',
         version: '1.0.0',
         contact: {
           name: 'Équipe Solia',
@@ -46,7 +47,17 @@ export default fp(async function (fastify: FastifyInstance) {
               updatedAt: { type: 'string', format: 'date-time' },
               tenantId: { type: 'string' },
             },
-            required: ['id', 'email', 'password', 'firstName', 'lastName', 'role', 'createdAt', 'updatedAt', 'tenantId'],
+            required: [
+              'id',
+              'email',
+              'password',
+              'firstName',
+              'lastName',
+              'role',
+              'createdAt',
+              'updatedAt',
+              'tenantId',
+            ],
           },
           Organization: {
             type: 'object',
@@ -77,7 +88,17 @@ export default fp(async function (fastify: FastifyInstance) {
               updatedAt: { type: 'string', format: 'date-time' },
               tenantId: { type: 'string' },
             },
-            required: ['id', 'amount', 'method', 'donorId', 'operatorId', 'missionId', 'createdAt', 'updatedAt', 'tenantId'],
+            required: [
+              'id',
+              'amount',
+              'method',
+              'donorId',
+              'operatorId',
+              'missionId',
+              'createdAt',
+              'updatedAt',
+              'tenantId',
+            ],
           },
           Mission: {
             type: 'object',
@@ -93,7 +114,17 @@ export default fp(async function (fastify: FastifyInstance) {
               updatedAt: { type: 'string', format: 'date-time' },
               tenantId: { type: 'string' },
             },
-            required: ['id', 'name', 'startDate', 'endDate', 'status', 'organizationId', 'createdAt', 'updatedAt', 'tenantId'],
+            required: [
+              'id',
+              'name',
+              'startDate',
+              'endDate',
+              'status',
+              'organizationId',
+              'createdAt',
+              'updatedAt',
+              'tenantId',
+            ],
           },
           Task: {
             type: 'object',
@@ -108,7 +139,16 @@ export default fp(async function (fastify: FastifyInstance) {
               updatedAt: { type: 'string', format: 'date-time' },
               tenantId: { type: 'string' },
             },
-            required: ['id', 'title', 'assignedTo', 'dueDate', 'status', 'createdAt', 'updatedAt', 'tenantId'],
+            required: [
+              'id',
+              'title',
+              'assignedTo',
+              'dueDate',
+              'status',
+              'createdAt',
+              'updatedAt',
+              'tenantId',
+            ],
           },
           Comment: {
             type: 'object',
@@ -122,7 +162,16 @@ export default fp(async function (fastify: FastifyInstance) {
               updatedAt: { type: 'string', format: 'date-time' },
               tenantId: { type: 'string' },
             },
-            required: ['id', 'content', 'authorId', 'targetType', 'targetId', 'createdAt', 'updatedAt', 'tenantId'],
+            required: [
+              'id',
+              'content',
+              'authorId',
+              'targetType',
+              'targetId',
+              'createdAt',
+              'updatedAt',
+              'tenantId',
+            ],
           },
           Tag: {
             type: 'object',
@@ -136,7 +185,15 @@ export default fp(async function (fastify: FastifyInstance) {
               updatedAt: { type: 'string', format: 'date-time' },
               tenantId: { type: 'string' },
             },
-            required: ['id', 'name', 'targetType', 'targetId', 'createdAt', 'updatedAt', 'tenantId'],
+            required: [
+              'id',
+              'name',
+              'targetType',
+              'targetId',
+              'createdAt',
+              'updatedAt',
+              'tenantId',
+            ],
           },
         },
       },

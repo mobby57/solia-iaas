@@ -1,1 +1,34 @@
-# Dockerfile de production
+# Multi-stage Dockerfile for monorepo apps/api
+
+# Step 1: builder
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy entire monorepo
+COPY package.json pnpm-lock.yaml ./
+COPY apps/api apps/api
+COPY apps/web apps/web
+
+# Install dependencies at root
+RUN npm install -g pnpm && pnpm install
+
+# Build apps/api
+WORKDIR /app/apps/api
+RUN pnpm build
+
+# Step 2: runner
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only build output and package.json from builder
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/package.json ./package.json
+
+# Install production dependencies only
+RUN npm install --omit=dev
+
+EXPOSE 3001
+
+CMD ["node", "dist/index.js"]

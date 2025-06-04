@@ -1,4 +1,4 @@
-import {prisma} from '../../lib/prisma';
+import { prisma } from '../../lib/prisma';
 
 export async function getDonations(tenantId: string) {
   return prisma.donation.findMany({ where: { tenantId } });
@@ -32,7 +32,10 @@ export async function updateDonation(id: string, data: any, tenantId: string) {
       data,
     });
   } catch (error: any) {
-    if (error.message === 'No donation found for update with the given id and tenant' || error.code === 'P2025') {
+    if (
+      error.message === 'No donation found for update with the given id and tenant' ||
+      error.code === 'P2025'
+    ) {
       throw new Error('No donation found for update with the given id and tenant');
     }
     throw error;

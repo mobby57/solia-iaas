@@ -1,15 +1,12 @@
-import { describe, beforeAll, afterAll, test, expect } from 'vitest';
-import { app as app_1 } from '../apps';
-import { resetDatabase, disconnectDatabase } from '../tests/testSetup';
+import { buildApp } from '../../../apps/api/src/app';
 import { prisma } from '../lib/prisma';
+import { resetDatabase, disconnectDatabase } from '../tests/testSetup';
 
-import fastify from 'fastify';
+let app_1;
 
-export const app = fastify({
-  logger: false
-});
 describe('Auth Service', () => {
   beforeAll(async () => {
+    app_1 = await buildApp();
     await resetDatabase();
 
     // Création d’un rôle et d’un tenant nécessaires au test
@@ -29,7 +26,7 @@ describe('Auth Service', () => {
       lastName: 'User',
       roleId: 'admin',
       tenantId: 'tenant123',
-      organizationName: 'Test Org'
+      organizationName: 'Test Org',
     };
 
     const response = await app_1.inject({

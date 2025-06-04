@@ -1,14 +1,15 @@
-import { prisma } from '../lib/prisma';
 import { seedAll } from '../../prisma/seeds/seedAll';
+import { prisma } from '../lib/prisma';
 
 export async function cleanDatabase() {
-  const collections = await prisma.$runCommandRaw({
+  const collections = (await prisma.$runCommandRaw({
     listCollections: 1,
-  }) as { cursor?: { firstBatch?: Array<{ name: string }> } };
+  })) as { cursor?: { firstBatch?: Array<{ name: string }> } };
 
-  const collectionNames = collections.cursor?.firstBatch
-    ?.map((c: any) => c.name)
-    .filter((name: string) => !name.startsWith('system.')) ?? [];
+  const collectionNames =
+    collections.cursor?.firstBatch
+      ?.map((c: any) => c.name)
+      .filter((name: string) => !name.startsWith('system.')) ?? [];
 
   for (const name of collectionNames) {
     await prisma.$runCommandRaw({

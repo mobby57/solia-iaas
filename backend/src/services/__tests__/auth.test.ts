@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import bcrypt from 'bcrypt';
+import { describe, it, expect } from 'vitest';
 
 describe('bcrypt hashing', () => {
   it('should hash and verify password correctly', async () => {

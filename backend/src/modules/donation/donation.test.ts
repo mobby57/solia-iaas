@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import prisma from '../../lib/prisma';
-import * as donationService from './donation.service';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
+import * as donationService from './donation.service';
 
 let donorId: string;
 let organizationId: string;
@@ -76,27 +76,34 @@ describe('Donation Service', () => {
       {
         amount: 100,
         date: new Date(),
-      userId: donorId,
-      organizationId,
+        userId: donorId,
+        organizationId,
       },
-      tenantId
+      tenantId,
     );
     expect(donation).toBeDefined();
   });
 
   it('should update a donation', async () => {
-    const created = await donationService.createDonation({
-      amount: 100,
-      date: new Date(),
-      userId: donorId,
-      organizationId,
-    }, tenantId);
+    const created = await donationService.createDonation(
+      {
+        amount: 100,
+        date: new Date(),
+        userId: donorId,
+        organizationId,
+      },
+      tenantId,
+    );
     console.log('Update Donation Test - created.id:', created.id);
     console.log('Update Donation Test - tenantId:', tenantId);
-    const updated = await donationService.updateDonation(created.id, {
-      amount: 200,
-      date: new Date(),
-    }, tenantId);
+    const updated = await donationService.updateDonation(
+      created.id,
+      {
+        amount: 200,
+        date: new Date(),
+      },
+      tenantId,
+    );
     expect(updated).toBeDefined();
   });
 
@@ -106,9 +113,9 @@ describe('Donation Service', () => {
         amount: 100,
         date: new Date(),
         tenantId,
-      user: {
-        connect: { id: donorId },
-      },
+        user: {
+          connect: { id: donorId },
+        },
         organization: {
           connect: { id: organizationId },
         },

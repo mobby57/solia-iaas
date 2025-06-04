@@ -1,4 +1,6 @@
 import { FastifyInstance } from 'fastify';
+import { verifyAuth } from '../../middlewares/verifyAuth';
+import { verifyRole } from '../../middlewares/verifyRole';
 import {
   getOrganizations,
   getOrganizationById,
@@ -6,8 +8,6 @@ import {
   updateOrganization,
   deleteOrganization,
 } from './organization.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function organizationRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
-import LRU from "lru-cache";
-import TenantSchema from "../schema/tenant.js";
-import TenantUserSchema from "../schema/tenantUser.js";
-import UserSchema from "../schema/users.js";
+import LRU from 'lru-cache';
+import mongoose from 'mongoose';
+import TenantSchema from '../schema/tenant.js';
+import TenantUserSchema from '../schema/tenantUser.js';
+import UserSchema from '../schema/users.js';
 
 const clientOptions = {
   socketTimeoutMS: 30000,
@@ -11,7 +11,7 @@ const clientOptions = {
 };
 
 // Log MongoDB queries
-mongoose.set("debug", true);
+mongoose.set('debug', true);
 
 // LRU cache for tenant connections
 const tenantConnectionCache = new LRU({
@@ -19,11 +19,13 @@ const tenantConnectionCache = new LRU({
   ttl: 1000 * 60 * 60, // 1 hour TTL for cache entries
   dispose: (db, key) => {
     if (db && db.close) {
-      db.close().then(() => {
-        console.log(`Closed tenant connection for ${key} due to cache eviction.`);
-      }).catch((err) => {
-        console.error(`Error closing tenant connection for ${key}:`, err);
-      });
+      db.close()
+        .then(() => {
+          console.log(`Closed tenant connection for ${key} due to cache eviction.`);
+        })
+        .catch((err) => {
+          console.error(`Error closing tenant connection for ${key}:`, err);
+        });
     }
   },
 });
@@ -32,16 +34,16 @@ let adminConnection = null;
 
 const loadAdminModels = (db) => {
   if (!db.models.tenants) {
-    db.model("tenants", TenantSchema);
+    db.model('tenants', TenantSchema);
   }
   if (!db.models.tenantusers) {
-    db.model("tenantusers", TenantUserSchema);
+    db.model('tenantusers', TenantUserSchema);
   }
 };
 
 const loadTenantModels = (db) => {
   if (!db.models.users) {
-    db.model("users", UserSchema);
+    db.model('users', UserSchema);
   }
 };
 
@@ -57,16 +59,16 @@ export const getAdminDbConnection = async (DB_URL) => {
   try {
     const db = mongoose.createConnection(DB_URL, clientOptions);
 
-    db.on("error", (err) => {
-      console.error("Admin db error: ", err);
+    db.on('error', (err) => {
+      console.error('Admin db error: ', err);
     });
 
     await new Promise((resolve, reject) => {
-      db.once("open", () => {
-        console.log("Admin client MongoDB Connection ok!");
+      db.once('open', () => {
+        console.log('Admin client MongoDB Connection ok!');
         resolve();
       });
-      db.on("error", reject);
+      db.on('error', reject);
     });
 
     loadAdminModels(db);
@@ -74,7 +76,7 @@ export const getAdminDbConnection = async (DB_URL) => {
     adminConnection = db;
     return adminConnection;
   } catch (error) {
-    console.error("Failed to initialize admin DB connection:", error);
+    console.error('Failed to initialize admin DB connection:', error);
     throw error;
   }
 };
@@ -96,16 +98,16 @@ export const getTenantDbConnection = async (DB_URL, dbName) => {
       dbName,
     });
 
-    db.on("error", (err) => {
+    db.on('error', (err) => {
       console.error(`Tenant ${dbName} db error: `, err);
     });
 
     await new Promise((resolve, reject) => {
-      db.once("open", () => {
+      db.once('open', () => {
         console.log(`Tenant connection for ${dbName} MongoDB Connection ok!`);
         resolve();
       });
-      db.on("error", reject);
+      db.on('error', reject);
     });
 
     loadTenantModels(db);

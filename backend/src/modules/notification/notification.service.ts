@@ -1,5 +1,5 @@
-import prisma from '../../lib/prisma';
 import { NotificationType, NotificationPriority } from '@prisma/client';
+import prisma from '../../lib/prisma';
 
 export async function createNotification(data: any, tenantId: string) {
   return prisma.notification.create({

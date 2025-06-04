@@ -1,5 +1,5 @@
-import { prisma } from '../lib/prisma';
 import bcrypt from 'bcrypt';
+import { prisma } from '../lib/prisma';
 
 export async function getUsers(tenantId: string) {
   return prisma.user.findMany({ where: { tenantId }, cacheStrategy: { ttl: 60 } });

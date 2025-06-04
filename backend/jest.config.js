@@ -10,9 +10,7 @@ export default {
     '^@services/(.*)$': '<rootDir>/src/services/$1',
     '^@models/(.*)$': '<rootDir>/src/models/$1',
   },
-  transformIgnorePatterns: [
-    '/node_modules/(?!some-esm-package)/',
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!some-esm-package)/'],
   globals: {
     'ts-jest': {
       useESM: true,

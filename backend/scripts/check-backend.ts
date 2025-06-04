@@ -33,7 +33,11 @@ async function checkEndpoint(method: 'get' | 'post', url: string) {
     }
   } catch (error: any) {
     if (error.response) {
-      console.log(chalk.red(`❌ ${method.toUpperCase()} ${url} => ${error.response.status} ${JSON.stringify(error.response.data)}`));
+      console.log(
+        chalk.red(
+          `❌ ${method.toUpperCase()} ${url} => ${error.response.status} ${JSON.stringify(error.response.data)}`,
+        ),
+      );
     } else if (error.request) {
       console.log(chalk.red(`❌ ${method.toUpperCase()} ${url} => No response received`));
     } else {
@@ -54,12 +58,16 @@ async function main() {
 
   console.log(chalk.blue(`🔐 Test authentification...`));
   try {
-    const loginRes = await axios.post(`${BASE_URL}/auth/login`, {
-      email: 'test@solia.org',
-      password: 'test123',
-    }, {
-      headers: { 'x-tenant-id': TENANT_ID }
-    });
+    const loginRes = await axios.post(
+      `${BASE_URL}/auth/login`,
+      {
+        email: 'test@solia.org',
+        password: 'test123',
+      },
+      {
+        headers: { 'x-tenant-id': TENANT_ID },
+      },
+    );
 
     const token = loginRes.data?.token;
     if (token) {
@@ -69,7 +77,11 @@ async function main() {
     }
   } catch (err: any) {
     if (err.response) {
-      console.log(chalk.red(`❌ Authentification échouée : ${err.response.status} ${JSON.stringify(err.response.data)}`));
+      console.log(
+        chalk.red(
+          `❌ Authentification échouée : ${err.response.status} ${JSON.stringify(err.response.data)}`,
+        ),
+      );
     } else if (err.request) {
       console.log(chalk.red(`❌ Authentification échouée : No response received`));
     } else {

@@ -1,8 +1,8 @@
-import Fastify from 'fastify';
-import { loginRoutes } from '../login';
-import { vi, describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import Fastify from 'fastify';
+import { vi, describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { loginRoutes } from '../login';
 
 const prisma = new PrismaClient();
 
@@ -44,8 +44,8 @@ describe('Auth Routes', () => {
       url: '/auth/login',
       payload: {
         email: 'admin@example.com',
-        password: 'ChangeMe123!'
-      }
+        password: 'ChangeMe123!',
+      },
     });
 
     expect(response.statusCode).toBe(200);
@@ -60,8 +60,8 @@ describe('Auth Routes', () => {
       url: '/auth/login',
       payload: {
         email: 'admin@example.com',
-        password: 'WrongPassword!'
-      }
+        password: 'WrongPassword!',
+      },
     });
 
     expect(response.statusCode).toBe(401);
@@ -75,8 +75,8 @@ describe('Auth Routes', () => {
       url: '/auth/login',
       payload: {
         email: 'nonexistent@example.com',
-        password: 'ChangeMe123!'
-      }
+        password: 'ChangeMe123!',
+      },
     });
 
     expect(response.statusCode).toBe(401);
@@ -89,8 +89,8 @@ describe('Auth Routes', () => {
       method: 'POST',
       url: '/auth/login',
       payload: {
-        password: 'ChangeMe123!'
-      }
+        password: 'ChangeMe123!',
+      },
     });
 
     expect(response.statusCode).toBe(400);
@@ -101,8 +101,8 @@ describe('Auth Routes', () => {
       method: 'POST',
       url: '/auth/login',
       payload: {
-        email: 'admin@example.com'
-      }
+        email: 'admin@example.com',
+      },
     });
 
     expect(response.statusCode).toBe(400);

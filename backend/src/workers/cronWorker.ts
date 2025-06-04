@@ -7,7 +7,7 @@ const cronWorker = new Worker(
     console.log('⏰ Running scheduled task:', job.name);
     // TODO: add cron task logic here
   },
-  { connection: redis }
+  { connection: redis },
 );
 
 cronWorker.on('completed', (job) => {

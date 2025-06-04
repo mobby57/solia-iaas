@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import prisma from '../lib/prisma';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { prisma } from '../lib/prisma';
 import { createTask, updateTask } from './task.service';
 
 describe('Task Service', () => {
@@ -14,27 +14,31 @@ describe('Task Service', () => {
     await prisma.user.deleteMany();
     await prisma.mission.deleteMany();
 
-    // Crée un user de test
     testUser = await prisma.user.create({
       data: {
         email: 'testuser@example.com',
         firstName: 'Test',
         lastName: 'User',
         tenantId,
-        role: 'operator', // ou autre rôle valide
+        role: 'OPERATOR', // Use correct enum value
+        password: 'testpassword', // Added required password field
       },
     });
 
-    // Crée une mission de test
     testMission = await prisma.mission.create({
       data: {
         name: 'Test Mission',
         startDate: new Date(),
         endDate: new Date(),
         tenantId,
+        userId: testUser.id, // Assuming userId is required
       },
     });
   }, 30000);
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
 
   it('should create and update a task with tenantId', async () => {
     testTask = await createTask(
@@ -44,7 +48,7 @@ describe('Task Service', () => {
         userId: testUser.id,
         missionId: testMission.id,
       },
-      tenantId
+      tenantId,
     );
 
     expect(testTask).toBeDefined();
@@ -56,7 +60,7 @@ describe('Task Service', () => {
         status: 'completed',
         date: new Date(),
       },
-      tenantId
+      tenantId,
     );
 
     expect(updated).not.toBeNull();
@@ -64,15 +68,17 @@ describe('Task Service', () => {
   }, 30000);
 
   it('should reject creating a task without tenantId', async () => {
-    await expect(createTask(
-      {
-        status: 'pending',
-        date: new Date(),
-        userId: testUser.id,
-        missionId: testMission.id,
-      },
-      ''
-    )).rejects.toThrow();
+    await expect(
+      createTask(
+        {
+          status: 'pending',
+          date: new Date(),
+          userId: testUser.id,
+          missionId: testMission.id,
+        },
+        '',
+      ),
+    ).rejects.toThrow();
   });
 
   it('should reject updating a task with mismatched tenantId', async () => {
@@ -83,16 +89,18 @@ describe('Task Service', () => {
         userId: testUser.id,
         missionId: testMission.id,
       },
-      tenantId
+      tenantId,
     );
 
-    await expect(updateTask(
-      testTask.id,
-      {
-        status: 'completed',
-        date: new Date(),
-      },
-      'wrong-tenant'
-    )).rejects.toThrow();
+    await expect(
+      updateTask(
+        testTask.id,
+        {
+          status: 'completed',
+          date: new Date(),
+        },
+        'wrong-tenant',
+      ),
+    ).rejects.toThrow();
   });
 });

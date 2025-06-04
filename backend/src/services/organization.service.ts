@@ -1,7 +1,17 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 
-export async function getOrganizations({ tenantId }: { tenantId: string; }): Promise<{ tenantId: string; createdAt: Date; updatedAt: Date; createdBy: string | null; updatedBy: string | null; id: string; name: string; }[]> {
+export async function getOrganizations({ tenantId }: { tenantId: string }): Promise<
+  {
+    tenantId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    createdBy: string | null;
+    updatedBy: string | null;
+    id: string;
+    name: string;
+  }[]
+> {
   return prisma.organization.findMany({ where: { tenantId } });
 }
 
@@ -11,7 +21,10 @@ export async function getOrganizationById(id: string, tenantId: string) {
   });
 }
 
-export async function createOrganization(data: Omit<Prisma.OrganizationCreateInput, 'tenantId'>, tenantId: string) {
+export async function createOrganization(
+  data: Omit<Prisma.OrganizationCreateInput, 'tenantId'>,
+  tenantId: string,
+) {
   return prisma.organization.create({
     data: {
       ...data,

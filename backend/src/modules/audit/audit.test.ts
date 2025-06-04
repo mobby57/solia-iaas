@@ -1,7 +1,7 @@
-import { ObjectId } from "mongodb";
-import * as auditService from './audit.service';
+import { ObjectId } from 'mongodb';
 import { describe, it, expect, beforeAll } from 'vitest';
 import prisma from '../../lib/prisma';
+import * as auditService from './audit.service';
 
 describe('Audit Service', () => {
   const fakeUserId = new ObjectId().toHexString();
@@ -34,12 +34,15 @@ describe('Audit Service', () => {
     });
 
     // Create an audit record for update and delete tests
-    const created = await auditService.createAudit({
-      action: 'Initial Action',
-      updatedBy: fakeUserId,
-      entity: 'TestEntity',
-      entityId: new ObjectId().toHexString(),
-    }, fakeTenantId);
+    const created = await auditService.createAudit(
+      {
+        action: 'Initial Action',
+        updatedBy: fakeUserId,
+        entity: 'TestEntity',
+        entityId: new ObjectId().toHexString(),
+      },
+      fakeTenantId,
+    );
     expect(created).toBeDefined();
     createdAuditId = created.id;
   }, 30000);
@@ -55,22 +58,30 @@ describe('Audit Service', () => {
   }, 30000);
 
   it('should create an audit', async () => {
-    const audit = await auditService.createAudit({
-      action: 'Test Action',
-      updatedBy: fakeUserId,
-      entity: 'TestEntity',
-      entityId: new ObjectId().toHexString(),
-    }, fakeTenantId);
+    const audit = await auditService.createAudit(
+      {
+        action: 'Test Action',
+        updatedBy: fakeUserId,
+        entity: 'TestEntity',
+        entityId: new ObjectId().toHexString(),
+      },
+      fakeTenantId,
+    );
     expect(audit).toBeDefined();
   }, 30000);
 
   it('should reject creating an audit without tenantId', async () => {
-    await expect(auditService.createAudit({
-      action: 'No Tenant Action',
-      updatedBy: fakeUserId,
-      entity: 'TestEntity',
-      entityId: new ObjectId().toHexString(),
-    }, '')).rejects.toThrow();
+    await expect(
+      auditService.createAudit(
+        {
+          action: 'No Tenant Action',
+          updatedBy: fakeUserId,
+          entity: 'TestEntity',
+          entityId: new ObjectId().toHexString(),
+        },
+        '',
+      ),
+    ).rejects.toThrow();
   });
 
   it('should update an audit', async () => {

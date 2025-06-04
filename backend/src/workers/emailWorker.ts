@@ -8,7 +8,7 @@ const emailWorker = new Worker(
     console.log(`📨 Sending email receipt for donation ${donationId} to ${userEmail}`);
     // TODO: add real email sending logic here (e.g. nodemailer, SendGrid)
   },
-  { connection: redis }
+  { connection: redis },
 );
 
 emailWorker.on('completed', (job) => {

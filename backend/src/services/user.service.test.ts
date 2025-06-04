@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { updateUser, createUser } from './user.service';
-import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { prisma } from '../lib/prisma';
 import { resetTestDatabase, disconnectDatabase } from '../tests/resetTestDatabase';
+import { updateUser, createUser } from './user.service';
 
 describe('User Service', () => {
   beforeAll(async () => {
@@ -28,7 +28,16 @@ describe('User Service', () => {
       const role = await prisma.role.findFirst({ where: { tenantId: 'default-tenant' } });
       if (!role) throw new Error('Role not found in test setup');
       const roleId = role.id;
-      const user = await createUser({ email: 'test@example.com', password: 'password', name: 'Original User', roleId, tenantId: 'default-tenant' }, 'default-tenant');
+      const user = await createUser(
+        {
+          email: 'test@example.com',
+          password: 'password',
+          name: 'Original User',
+          roleId,
+          tenantId: 'default-tenant',
+        },
+        'default-tenant',
+      );
       const userId = user.id;
       const updatedUser = await updateUser(userId, { name: 'Updated User' }, 'default-tenant');
       expect(updatedUser.name).toBe('Updated User');
@@ -53,7 +62,7 @@ describe('User Service', () => {
           roleId,
           tenantId: 'default-tenant',
         },
-        'default-tenant'
+        'default-tenant',
       );
 
       expect(user.email).toBe('newuser@example.com');
@@ -76,16 +85,18 @@ describe('User Service', () => {
       if (!role) throw new Error('Role not found in test setup');
       const roleId = role.id;
 
-      await expect(createUser(
-        {
-          email: 'notenant@example.com',
-          password: 'password',
-          name: 'No Tenant User',
-          roleId,
-          tenantId: '', // empty tenantId
-        },
-        ''
-      )).rejects.toThrow();
+      await expect(
+        createUser(
+          {
+            email: 'notenant@example.com',
+            password: 'password',
+            name: 'No Tenant User',
+            roleId,
+            tenantId: '', // empty tenantId
+          },
+          '',
+        ),
+      ).rejects.toThrow();
     } catch (error) {
       console.error('Error in reject create user without tenantId test:', error);
       throw error;
@@ -98,7 +109,16 @@ describe('User Service', () => {
       if (!role) throw new Error('Role not found in test setup');
       const roleId = role.id;
 
-      const user = await createUser({ email: 'cross@example.com', password: 'password', name: 'Cross Tenant User', roleId, tenantId: 'default-tenant' }, 'default-tenant');
+      const user = await createUser(
+        {
+          email: 'cross@example.com',
+          password: 'password',
+          name: 'Cross Tenant User',
+          roleId,
+          tenantId: 'default-tenant',
+        },
+        'default-tenant',
+      );
       const userId = user.id;
 
       // Attempt to update with wrong tenantId

@@ -52,28 +52,32 @@
       "name": "Auth - Signup ONG",
       "request": {
         "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"email\": \"ong@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"ONG Example\",\n  \"roleId\": \"{{roleOngId}}\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/auth/signup", "host": ["{{baseUrl}}"], "path": ["auth", "signup"] }
+        "url": {
+          "raw": "{{baseUrl}}/auth/signup",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "signup"]
+        }
       }
     },
     {
       "name": "Auth - Login ONG",
       "request": {
         "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"email\": \"ong@example.com\",\n  \"password\": \"password123\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
       }
     },
     {
@@ -94,7 +98,11 @@
             }
           ]
         },
-        "url": { "raw": "{{baseUrl}}/org/documents", "host": ["{{baseUrl}}"], "path": ["org", "documents"] }
+        "url": {
+          "raw": "{{baseUrl}}/org/documents",
+          "host": ["{{baseUrl}}"],
+          "path": ["org", "documents"]
+        }
       }
     },
     {
@@ -122,7 +130,12 @@
           "mode": "raw",
           "raw": "{\n  \"email\": \"freelancer@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Freelancer User\",\n  \"roleId\": \"{{roleFreelancerId}}\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/auth/signup?role=freelancer", "host": ["{{baseUrl}}"], "path": ["auth", "signup"], "query": [{ "key": "role", "value": "freelancer" }] }
+        "url": {
+          "raw": "{{baseUrl}}/auth/signup?role=freelancer",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "signup"],
+          "query": [{ "key": "role", "value": "freelancer" }]
+        }
       }
     },
     {
@@ -130,19 +143,30 @@
       "request": {
         "method": "GET",
         "header": [{ "key": "Authorization", "value": "Bearer {{freelancerToken}}" }],
-        "url": { "raw": "{{baseUrl}}/missions/today", "host": ["{{baseUrl}}"], "path": ["missions", "today"] }
+        "url": {
+          "raw": "{{baseUrl}}/missions/today",
+          "host": ["{{baseUrl}}"],
+          "path": ["missions", "today"]
+        }
       }
     },
     {
       "name": "Freelancer - Post Daily Report",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Authorization", "value": "Bearer {{freelancerToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{freelancerToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"report\": \"Report content here\",\n  \"missionId\": \"<mission_id>\",\n  \"date\": \"2025-05-31\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/missions/<mission_id>/report", "host": ["{{baseUrl}}"], "path": ["missions", "<mission_id>", "report"] }
+        "url": {
+          "raw": "{{baseUrl}}/missions/<mission_id>/report",
+          "host": ["{{baseUrl}}"],
+          "path": ["missions", "<mission_id>", "report"]
+        }
       }
     },
     {
@@ -166,7 +190,11 @@
           "mode": "raw",
           "raw": "{\n  \"mandateData\": \"<mandate_data>\",\n  \"donorId\": \"<donor_id>\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/donate/mandate", "host": ["{{baseUrl}}"], "path": ["donate", "mandate"] }
+        "url": {
+          "raw": "{{baseUrl}}/donate/mandate",
+          "host": ["{{baseUrl}}"],
+          "path": ["donate", "mandate"]
+        }
       }
     },
     {
@@ -182,31 +210,49 @@
       "request": {
         "method": "GET",
         "header": [{ "key": "Authorization", "value": "Bearer {{donorToken}}" }],
-        "url": { "raw": "{{baseUrl}}/documents/receipt", "host": ["{{baseUrl}}"], "path": ["documents", "receipt"] }
+        "url": {
+          "raw": "{{baseUrl}}/documents/receipt",
+          "host": ["{{baseUrl}}"],
+          "path": ["documents", "receipt"]
+        }
       }
     },
     {
       "name": "Admin - Create Contract",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"contractDetails\": \"Contract details here\",\n  \"tenantId\": \"{{tenantId}}\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/contracts/create", "host": ["{{baseUrl}}"], "path": ["contracts", "create"] }
+        "url": {
+          "raw": "{{baseUrl}}/contracts/create",
+          "host": ["{{baseUrl}}"],
+          "path": ["contracts", "create"]
+        }
       }
     },
     {
       "name": "Admin - Add API Integration",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"integrationName\": \"HelloAsso\",\n  \"config\": {}\n}"
         },
-        "url": { "raw": "{{baseUrl}}/api-integrations", "host": ["{{baseUrl}}"], "path": ["api-integrations"] }
+        "url": {
+          "raw": "{{baseUrl}}/api-integrations",
+          "host": ["{{baseUrl}}"],
+          "path": ["api-integrations"]
+        }
       }
     },
     {

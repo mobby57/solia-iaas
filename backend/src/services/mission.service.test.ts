@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import prisma from '../lib/prisma';
-import { createMission, updateMission, deleteMission, getMissionById } from './mission.service';
 import { resetTestDatabase, disconnectDatabase } from '../tests/resetTestDatabase';
+import { createMission, updateMission, deleteMission, getMissionById } from './mission.service';
 
 describe('Mission Service', () => {
   const tenantId = 'default-tenant';

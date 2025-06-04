@@ -1,9 +1,18 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import jwt from 'jsonwebtoken';
+import { FastifyRequest, FastifyReply } from 'fastify';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
 
-export async function verifyJWT(request: FastifyRequest, reply: FastifyReply) {
+// Extend FastifyRequest interface to include user property
+declare module 'fastify' {
+  interface FastifyRequest {
+    readonly user?: string | JwtPayload;
+  }
+}
+
+type NewType = FastifyRequest;
+
+export default async function verifyJWT(request: NewType, reply: fastify.FastifyReply) {
   try {
     const authHeader = request.headers['authorization'];
     if (!authHeader) {
@@ -15,10 +24,10 @@ export async function verifyJWT(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(401).send({ error: 'Token missing' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as string | JwtPayload;
     // Attach decoded token to request for further use
     (request as any).user = decoded;
-  } catch (error) {
+  } catch (_error) {
     return reply.status(401).send({ error: 'Invalid or expired token' });
   }
 }

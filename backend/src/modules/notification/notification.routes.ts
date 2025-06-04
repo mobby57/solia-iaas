@@ -1,4 +1,6 @@
 import { FastifyInstance } from 'fastify';
+import { verifyAuth } from '../../middlewares/verifyAuth';
+import { verifyRole } from '../../middlewares/verifyRole';
 import {
   getNotifications,
   getNotificationById,
@@ -6,8 +8,6 @@ import {
   updateNotification,
   deleteNotification,
 } from './notification.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function notificationRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

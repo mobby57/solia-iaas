@@ -1,0 +1,259 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMS
+
+enum UserRole {
+  OPERATOR
+  MANAGER
+  ASSOCIATION
+  DONOR
+}
+
+enum NotificationType {
+  EMAIL
+  SMS
+  PUSH
+}
+
+// USER
+
+model User {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId       String
+  email          String       @unique
+  password       String
+  role           UserRole
+  firstName      String
+  lastName       String
+  kyc            KYC?
+  organizationId String?      @db.ObjectId
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  createdBy      String?
+  updatedBy      String?
+  deletedAt      DateTime?
+
+  donations      Donation[]
+  missions       Mission[]
+  tasks          Task[]
+  comments       Comment[]
+  files          File[]
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+
+  @@index([tenantId])
+}
+
+// KYC
+
+model KYC {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId   String
+  userId     String   @unique @db.ObjectId
+  status     String
+  documents  Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  deletedAt  DateTime?
+
+  user       User     @relation(fields: [userId], references: [id])
+  files      File[]
+
+  @@index([tenantId])
+}
+
+// DONATION
+
+model Donation {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId   String
+  amount     Float
+  date       DateTime
+  userId     String   @db.ObjectId
+  missionId  String?  @db.ObjectId
+  organizationId String? @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  deletedAt  DateTime?
+
+  user       User     @relation(fields: [userId], references: [id])
+  mission    Mission? @relation(fields: [missionId], references: [id])
+  comments   Comment[]
+  organization Organization? @relation(fields: [organizationId], references: [id])
+
+  @@index([tenantId])
+}
+
+// MISSION
+
+model Mission {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId   String
+  name       String
+  startDate  DateTime
+  endDate    DateTime
+  userId     String   @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  deletedAt  DateTime?
+
+  user       User     @relation(fields: [userId], references: [id])
+  donations  Donation[]
+  tasks      Task[]
+  comments   Comment[]
+
+  @@index([tenantId])
+}
+
+// TASK STATUS ENUM
+
+enum TaskStatus {
+  pending
+  completed
+}
+
+// TASK
+
+model Task {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String
+  missionId   String     @db.ObjectId
+  userId      String     @db.ObjectId
+  title       String
+  date        DateTime
+  status      TaskStatus
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  deletedAt   DateTime?
+
+  mission     Mission    @relation(fields: [missionId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+}
+
+// COMMENT
+
+model Comment {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String
+  content     String
+  userId      String   @db.ObjectId
+  donationId  String?  @db.ObjectId
+  missionId   String?  @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  deletedAt   DateTime?
+
+  user        User     @relation(fields: [userId], references: [id])
+  donation    Donation? @relation(fields: [donationId], references: [id])
+  mission     Mission?  @relation(fields: [missionId], references: [id])
+  tags        Tag[]
+
+  @@index([tenantId])
+}
+
+// TAG
+
+model Tag {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId   String
+  name       String
+  commentId  String   @db.ObjectId
+  createdAt  DateTime @default(now())
+
+  comment    Comment  @relation(fields: [commentId], references: [id])
+
+  @@index([tenantId])
+}
+
+// ORGANIZATION
+
+model Organization {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  deletedAt   DateTime?
+
+  users       User[]
+  donations   Donation[]
+  files       File[]
+
+  @@index([tenantId])
+}
+
+// FILE
+
+model File {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId       String
+  url            String
+  name           String
+  type           String
+  userId         String?      @db.ObjectId
+  kycId          String?      @db.ObjectId
+  organizationId String?      @db.ObjectId
+  createdAt      DateTime     @default(now())
+
+  user           User?          @relation(fields: [userId], references: [id])
+  kyc            KYC?           @relation(fields: [kycId], references: [id])
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
+
+  @@index([tenantId])
+}
+
+// NOTIFICATION
+
+model Notification {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String
+  type        NotificationType
+  userId      String           @db.ObjectId
+  message     String
+  sentAt      DateTime         @default(now())
+  metadata    Json?
+
+  user        User             @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+}
+
+// AUDIT LOG
+
+model AuditLog {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String
+  action      String
+  entity      String
+  entityId    String
+  userId      String?    @db.ObjectId
+  timestamp   DateTime   @default(now())
+  meta        Json?
+
+  user        User?      @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+}

@@ -1,4 +1,6 @@
 import { FastifyInstance } from 'fastify';
+import { verifyAuth } from '../../middlewares/verifyAuth';
+import { verifyRole } from '../../middlewares/verifyRole';
 import {
   getMissions,
   getMissionById,
@@ -6,8 +8,6 @@ import {
   updateMission,
   deleteMission,
 } from './mission.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function missionRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

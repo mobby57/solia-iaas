@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import * as tagService from './tag.service';
 import { CreateTagSchema, UpdateTagSchema } from './tag.schema';
+import * as tagService from './tag.service';
 
 export async function getTags(request: FastifyRequest, reply: FastifyReply) {
   const tenantId = (request as any).tenantId;

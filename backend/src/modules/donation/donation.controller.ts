@@ -1,13 +1,12 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import * as donationService from './donation.service';
-import { CreateDonationSchema, UpdateDonationSchema } from './donation.schema';
 
 export async function getDonations(request: FastifyRequest, reply: FastifyReply) {
   const tenantId = (request as any).tenantId;
   try {
     const donations = await donationService.getDonations(tenantId);
     reply.send(donations);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to fetch donations' });
   }
 }
@@ -21,7 +20,7 @@ export async function getDonationById(request: FastifyRequest, reply: FastifyRep
       return;
     }
     reply.send(donation);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to fetch donation' });
   }
 }
@@ -32,10 +31,10 @@ export async function createDonation(request: FastifyRequest, reply: FastifyRepl
   try {
     const donation = await donationService.createDonation(
       { donorId, organizationId, ...rest },
-      tenantId
+      tenantId,
     );
     reply.status(201).send(donation);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to create donation' });
   }
 }
@@ -51,7 +50,7 @@ export async function updateDonation(request: FastifyRequest, reply: FastifyRepl
       return;
     }
     reply.send(donation);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to update donation' });
   }
 }
@@ -62,7 +61,7 @@ export async function deleteDonation(request: FastifyRequest, reply: FastifyRepl
   try {
     await donationService.deleteDonation(id, tenantId);
     reply.status(204).send();
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to delete donation' });
   }
 }

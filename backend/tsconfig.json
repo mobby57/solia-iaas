@@ -20,7 +20,8 @@
     "paths": {
       "@lib/*": ["lib/*"],
       "@services/*": ["services/*"],
-      "@models/*": ["models/*"]
+      "@models/*": ["models/*"],
+      "@api/*": ["../../apps/api/src/*"]
     }
   },
   "include": ["src", "prisma/seeds"],

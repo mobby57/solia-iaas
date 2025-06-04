@@ -1,4 +1,10 @@
 import { FastifyInstance } from 'fastify';
+import { auditLog } from '../middlewares/auditLog';
+import { tenantMiddleware } from '../middlewares/tenantMiddleware';
+import { verifyAuth } from '../middlewares/verifyAuth';
+import { verifyRole } from '../middlewares/verifyRole';
+import { verifyTenant } from '../middlewares/verifyTenant';
+
 import {
   getDonations,
   getDonationById,
@@ -6,12 +12,6 @@ import {
   updateDonation,
   deleteDonation,
 } from '../services/donation.service';
-import { verifyAuth } from '../middlewares/verifyAuth';
-import { verifyTenant } from '../middlewares/verifyTenant';
-import { verifyRole } from '../middlewares/verifyRole';
-import { auditLog } from '../middlewares/auditLog';
-
-import { tenantMiddleware } from '../middlewares/tenantMiddleware';
 
 export async function donationRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', tenantMiddleware);
@@ -60,13 +60,17 @@ export async function donationRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.delete('/donations/:id', { preHandler: verifyRole(['ADMIN']) }, async (request, reply) => {
-    const { id } = request.params as any;
-    try {
-      await deleteDonation(id);
-      reply.status(204).send();
-    } catch (error) {
-      reply.status(500).send({ error: 'Failed to delete donation' });
-    }
-  });
+  fastify.delete(
+    '/donations/:id',
+    { preHandler: verifyRole(['ADMIN']) },
+    async (request, reply) => {
+      const { id } = request.params as any;
+      try {
+        await deleteDonation(id);
+        reply.status(204).send();
+      } catch (error) {
+        reply.status(500).send({ error: 'Failed to delete donation' });
+      }
+    },
+  );
 }

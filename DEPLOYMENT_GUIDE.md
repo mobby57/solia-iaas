@@ -1,110 +1,196 @@
-# Deployment Guide for Solia Web App and API
+# Deployment Guide
 
-This guide covers the steps to deploy the Solia frontend (React + Vite) and backend API (Fastify) to production environments.
+## Render CLI Installation
+
+You can install the Render CLI using one of the following methods:
+
+### Homebrew (Linux/MacOS)
+```bash
+brew install render
+```
+
+### Direct Download
+Download the latest release from the [Render CLI GitHub releases](https://github.com/render-oss/cli/releases) page for your platform.
+
+### Build from Source
+We recommend building from source only if no other installation method works for your system.
+
+1. Install the Go programming language if you haven't already.
+2. Clone and build the CLI project:
+```bash
+git clone git@github.com:render-oss/cli.git
+cd cli
+
+```
+
+After installation completes, open a new terminal tab and run `render` with no arguments to confirm.
+
+## Authentication
+
+The Render CLI uses a CLI token to authenticate with the Render platform.
+
+### Login via CLI
+Run:go build -o render
+```bash
+render login
+```
+This opens your browser to authorize the CLI. After generating the token, the CLI saves it locally and prompts you to set your active workspace.
+
+You can switch workspaces anytime with:
+```bash
+render workspace set
+```
+
+### API Key Authentication (for CI/CD)
+Generate an API key in the Render Dashboard for automated environments.
+
+Set the environment variable:
+```bash
+export RENDER_API_KEY=rnd_your_api_key_here
+```
+
+API keys take precedence over CLI tokens.
+
+## Common Commands
+
+- `render login`  
+  Authorize the CLI and generate a token.
+
+- `render workspace set`  
+  Set the active workspace.
+
+- `render services`  
+  List all services and datastores in the active workspace.
+
+- `render deploys list [SERVICE_ID]`  
+  List deploys for a service.
+
+- `render deploys create [SERVICE_ID]`  
+  Trigger a deploy for a service.
+
+- `render psql [DATABASE_ID]`  
+  Open a psql session to a PostgreSQL database.
+
+- `render ssh [SERVICE_ID]`  
+  Open an SSH session to a running service instance.
+
+## Non-Interactive Mode (CI/CD)
+
+Use these flags for non-interactive usage:
+
+- `-o / --output`  
+  Set output format (`json`, `yaml`, `text`, or `interactive`).
+
+- `--confirm`  
+  Skip confirmation prompts.
+
+Example to list services in JSON:
+```bash
+render services --output json --confirm
+```
+
+## Example: GitHub Actions Workflow
+
+```yaml
+name: Render CLI Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  Deploy-Render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Render CLI
+        run: |
+          curl -L https://github.com/render-oss/cli/releases/download/v1.1.0/cli_1.1.0_linux_amd64.zip -o render.zip
+          unzip render.zip
+          sudo mv cli_v1.1.0 /usr/local/bin/render
+      - name: Trigger deploy with Render CLI
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          CI: true
+        run: |
+          render deploys create ${{ secrets.RENDER_SERVICE_ID }} --output json --confirm
+```
+
+## Local Configuration
+
+By default, the CLI stores its config at:
+```
+$HOME/.render/cli.yaml
+```
+You can change this by setting:
+```
+RENDER_CLI_CONFIG_PATH
+```
+
+## Managing CLI Tokens
+
+CLI tokens expire periodically. Re-authenticate with `render login` if needed.
+
+View and revoke tokens in your Render Dashboard Account Settings.
+
+For security, use API keys only in automated environments.
 
 ---
 
-## 1. Prerequisites
+## Integration in Solia Project
 
-- Node.js (version 18+ recommended)
-- Git repository with your code pushed
-- Hosting accounts for frontend and backend (e.g., Vercel, Netlify for frontend; Railway, Heroku, VPS for backend)
-- Environment variables ready (API URLs, JWT secrets, database URLs, etc.)
+### NPM Scripts for Render CLI (in `apps/api/package.json`)
 
----
+To simplify usage, the following npm scripts have been added:
 
-## 2. Deploying the Frontend (Solia Web)
+- `npm run render:login`  
+  Launches `render login` to authenticate.
 
-### Option A: Deploy to Vercel or Netlify
+- `npm run render:services`  
+  Lists your Render services.
 
-1. Push your frontend code (`apps/web`) to a Git repository (GitHub, GitLab, etc.).
-2. Create a new project on Vercel or Netlify and link it to your repository.
-3. Set the build command to:
-   ```
-   npm run build
-   ```
-4. Set the output directory to:
-   ```
-   dist
-   ```
-5. Configure environment variables if needed (e.g., API base URL).
-6. Deploy the site. The platform will build and host your frontend automatically.
+- `npm run deploy:api`  
+  Deploys the API service using the Render CLI.  
+  Requires the environment variable `RENDER_SERVICE_ID` to be set.
 
-### Option B: Manual Deployment on VPS or Static Server
+- `npm run render:logs`  
+  Shows logs for the API service.  
+  Requires `RENDER_SERVICE_ID`.
 
-1. Run locally:
-   ```
-   npm run build
-   ```
-2. Upload the contents of the `dist` folder to your static file server or CDN.
-3. Configure your web server to serve the static files and fallback to `index.html` for SPA routing.
+Example usage:
+```bash
+RENDER_SERVICE_ID=your_service_id npm run deploy:api
+```
 
----
+### GitHub Actions Workflows
 
-## 3. Deploying the Backend API (Solia API)
+Two workflows have been created to automate deployments on push to the `main` branch:
 
-### Option A: Deploy to Railway, Heroku, or similar PaaS
+- **API Deployment**:  
+  Located at `apps/api/.github/workflows/deploy-api.yml`  
+  Uses secrets `RENDER_API_KEY` and `RENDER_SERVICE_ID`.
 
-1. Push your backend code (`solia/apps/api`) to a Git repository.
-2. Create a new project on Railway, Heroku, or your chosen platform.
-3. Set the start command to:
-   ```
-   npm run start
-   ```
-4. Configure environment variables:
-   - Database connection string
-   - JWT secret keys
-   - Any other secrets or API keys
-5. Deploy the app. The platform will build and run your API server.
+- **Frontend Deployment**:  
+  Located at `apps/web/.github/workflows/deploy-frontend.yml`  
+  Uses secrets `RENDER_API_KEY` and `RENDER_FRONTEND_SERVICE_ID`.
 
-### Option B: Deploy on VPS or Custom Server
+### Setting GitHub Secrets
 
-1. SSH into your server.
-2. Clone your repository and navigate to the backend folder.
-3. Install dependencies:
-   ```
-   npm install
-   ```
-4. Build the project if needed:
-   ```
-   npm run build
-   ```
-5. Set environment variables in your shell or `.env` file.
-6. Start the server using a process manager like PM2:
-   ```
-   pm2 start dist/index.js --name solia-api
-   ```
-7. Configure your firewall and reverse proxy (e.g., Nginx) to expose the API.
+Add the following secrets in your GitHub repository settings:
 
----
+- `RENDER_API_KEY` : Your Render API key from [Render Dashboard > Account Settings > API Keys](https://dashboard.render.com/account)
+- `RENDER_SERVICE_ID` : The service ID for the API service (from `render services`)
+- `RENDER_FRONTEND_SERVICE_ID` : The service ID for the frontend service
 
-## 4. Environment Variables
+### Testing Locally
 
-Make sure to configure the following environment variables for both frontend and backend as needed:
+You can test the Render CLI commands locally via npm scripts, for example:
 
-- `VITE_API_BASE_URL` (frontend) — URL of the deployed backend API
-- `DATABASE_URL` (backend) — connection string to your database
-- `JWT_SECRET` (backend) — secret key for JWT tokens
-- Any third-party API keys or secrets
+```bash
+npm run render:login
+npm run render:services
+RENDER_SERVICE_ID=your_service_id npm run deploy:api
+```
 
----
+### Notes
 
-## 5. Post-Deployment
-
-- Test the deployed frontend and backend to ensure connectivity.
-- Monitor logs and errors.
-- Set up backups and scaling as needed.
-
----
-
-## 6. Additional Resources
-
-- [Vercel Documentation](https://vercel.com/docs)
-- [Netlify Documentation](https://docs.netlify.com/)
-- [Railway Documentation](https://docs.railway.app/)
-- [Heroku Documentation](https://devcenter.heroku.com/)
-- [PM2 Process Manager](https://pm2.keymetrics.io/)
-
----
-
-If you want, I can help you create deployment configuration files (e.g., GitHub Actions workflows) or scripts for these platforms.
+- Ensure you have installed the Render CLI locally or rely on the GitHub Actions workflows for automated deployment.
+- Keep your API keys secure and do not commit them to source control.

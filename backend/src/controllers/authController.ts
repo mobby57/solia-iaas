@@ -1,5 +1,5 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
 import bcrypt from 'bcrypt';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
 
@@ -32,7 +32,10 @@ interface LoginBody {
   tenantId: string;
 }
 
-export async function signupController(request: FastifyRequest<{ Body: SignupBody }>, reply: FastifyReply) {
+export async function signupController(
+  request: FastifyRequest<{ Body: SignupBody }>,
+  reply: FastifyReply,
+) {
   const {
     email,
     password,
@@ -103,7 +106,7 @@ export async function signupController(request: FastifyRequest<{ Body: SignupBod
             proofOfAddress,
             kbisIfFreelancer,
             proofOfRegistration,
-          }
+          },
         },
       },
       select: {
@@ -154,11 +157,9 @@ export async function signupController(request: FastifyRequest<{ Body: SignupBod
       await prisma.document.create({ data: doc });
     }
 
-    const token = jwt.sign(
-      { sub: user.id, tenantId, roleId, email },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = jwt.sign({ sub: user.id, tenantId, roleId, email }, JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
     return reply.status(201).send({ token, user });
   } catch (error) {
@@ -168,7 +169,10 @@ export async function signupController(request: FastifyRequest<{ Body: SignupBod
   }
 }
 
-export async function loginController(request: FastifyRequest<{ Body: LoginBody }>, reply: FastifyReply) {
+export async function loginController(
+  request: FastifyRequest<{ Body: LoginBody }>,
+  reply: FastifyReply,
+) {
   const { email, password, tenantId } = request.body;
 
   if (!email || !password || !tenantId) {
@@ -186,13 +190,11 @@ export async function loginController(request: FastifyRequest<{ Body: LoginBody 
       return reply.status(401).send({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign(
-      { sub: user.id, tenantId, roleId: user.roleId, email },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = jwt.sign({ sub: user.id, tenantId, roleId: user.roleId, email }, JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _password, ...userWithoutPassword } = user;
 
     return reply.status(200).send({ token, user: userWithoutPassword });
   } catch (error) {

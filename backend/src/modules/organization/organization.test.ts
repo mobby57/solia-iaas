@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import prisma from '../../lib/prisma';
-import * as organizationService from './organization.service';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
+import * as organizationService from './organization.service';
 
-let tenantId = '507f1f77bcf86cd799439011';
+const tenantId = '507f1f77bcf86cd799439011';
 
 describe('Organization Service', () => {
   beforeEach(async () => {
@@ -34,7 +34,10 @@ describe('Organization Service', () => {
   });
 
   it('should create an organization', async () => {
-    const organization = await organizationService.createOrganization({ name: 'Test Org' }, tenantId);
+    const organization = await organizationService.createOrganization(
+      { name: 'Test Org' },
+      tenantId,
+    );
     expect(organization).toBeDefined();
   });
 
@@ -45,7 +48,11 @@ describe('Organization Service', () => {
         tenantId,
       },
     });
-    const updated = await organizationService.updateOrganization(created.id, { name: 'Updated Org' }, tenantId);
+    const updated = await organizationService.updateOrganization(
+      created.id,
+      { name: 'Updated Org' },
+      tenantId,
+    );
     expect(updated).toBeDefined();
   });
 

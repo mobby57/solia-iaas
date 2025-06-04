@@ -3,7 +3,7 @@ import 'fastify';
 declare module 'fastify' {
   interface FastifyRequest {
     jwtVerify(): Promise<void>;
-    user: {
+    readonly user: {
       sub: string;
       tenantId: string;
       roleId: string;

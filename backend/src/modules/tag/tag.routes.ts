@@ -1,13 +1,7 @@
 import { FastifyInstance } from 'fastify';
-import {
-  getTags,
-  getTagById,
-  createTag,
-  updateTag,
-  deleteTag,
-} from './tag.controller';
 import { verifyAuth } from '../../middlewares/verifyAuth';
 import { verifyRole } from '../../middlewares/verifyRole';
+import { getTags, getTagById, createTag, updateTag, deleteTag } from './tag.controller';
 
 export async function tagRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

@@ -18,8 +18,15 @@ export async function tenantMiddleware(request: FastifyRequest, reply: FastifyRe
     }
 
     // Attach tenantId to request for downstream handlers
-    (request as any).tenantId = tenantId;
-  } catch (error) {
+    request.tenantId = tenantId;
+  } catch (_error) {
     reply.status(500).send({ error: 'Internal server error in tenant middleware' });
+  }
+}
+
+// Extend FastifyRequest interface to include tenantId property
+declare module 'fastify' {
+  interface FastifyRequest {
+    tenantId?: string;
   }
 }

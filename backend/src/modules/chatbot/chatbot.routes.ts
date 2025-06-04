@@ -1,4 +1,6 @@
 import { FastifyInstance } from 'fastify';
+import { verifyAuth } from '../../middlewares/verifyAuth';
+import { verifyRole } from '../../middlewares/verifyRole';
 import {
   getChatbots,
   getChatbotById,
@@ -6,8 +8,6 @@ import {
   updateChatbot,
   deleteChatbot,
 } from './chatbot.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function chatbotRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

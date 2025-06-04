@@ -9,7 +9,7 @@ export function verifyRole(allowedRoles: string[]) {
         reply.status(403).send({ error: 'Forbidden: insufficient role permissions' });
         return;
       }
-    } catch (err) {
+    } catch (_err) {
       reply.status(401).send({ error: 'Unauthorized' });
     }
   };

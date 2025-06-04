@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { prisma } from '../../lib/prisma';
-import * as documentService from '../document.service';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
+import * as documentService from '../document.service';
 
 const tenantId = 'default-tenant';
 
@@ -52,7 +52,7 @@ describe('Document Service', () => {
         url: 'https://example.com/newdoc.pdf',
         organizationId,
       },
-      tenantId
+      tenantId,
     );
     expect(document).toBeDefined();
   });
@@ -64,7 +64,7 @@ describe('Document Service', () => {
         url: 'https://example.com/updatedoc.pdf',
         organizationId,
       },
-      tenantId
+      tenantId,
     );
     const updated = await documentService.updateDocument(created.id, {
       name: 'Updated Document Name',

@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config';
 import path from 'path';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   root: './', // inutile ici car c'est la valeur par défaut
@@ -15,6 +15,7 @@ export default defineConfig({
       '@lib': path.resolve(__dirname, 'src/lib'),
       '@services': path.resolve(__dirname, 'src/services'),
       '@models': path.resolve(__dirname, 'src/models'),
+      '@api': path.resolve(__dirname, '../../apps/api/src'),
     },
   },
 });

@@ -1,4 +1,10 @@
 import { FastifyInstance } from 'fastify';
+import { auditLog } from '../middlewares/auditLog';
+import { tenantMiddleware } from '../middlewares/tenantMiddleware';
+import { verifyAuth } from '../middlewares/verifyAuth';
+import { verifyRole } from '../middlewares/verifyRole';
+import { verifyTenant } from '../middlewares/verifyTenant';
+
 import {
   getTasks,
   getTaskById,
@@ -6,12 +12,6 @@ import {
   updateTask,
   deleteTask,
 } from '../services/task.service';
-import { verifyAuth } from '../middlewares/verifyAuth';
-import { verifyTenant } from '../middlewares/verifyTenant';
-import { verifyRole } from '../middlewares/verifyRole';
-import { auditLog } from '../middlewares/auditLog';
-
-import { tenantMiddleware } from '../middlewares/tenantMiddleware';
 
 export async function taskRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', tenantMiddleware);

@@ -5,7 +5,7 @@ import { seedBaseData } from './seedBaseData';
 export async function resetTestDatabase() {
   // Delete child entities first
   await prisma.tag.deleteMany();
-  await prisma.task.deleteMany();              // Tasks before Missions
+  await prisma.task.deleteMany(); // Tasks before Missions
   await prisma.donation.deleteMany();
   await prisma.comment.deleteMany();
 
@@ -33,7 +33,7 @@ export async function resetTestDatabase() {
   await seedBaseData();
 
   // Add a small delay to ensure DB consistency before tests run
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   console.log('✅ Test database reset complete.');
 }

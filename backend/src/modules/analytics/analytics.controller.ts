@@ -7,7 +7,7 @@ export async function getDashboardData(request: FastifyRequest, reply: FastifyRe
   try {
     const data = await analyticsService.getDashboardData(tenantId);
     reply.send(data);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to fetch dashboard data' });
   }
 }

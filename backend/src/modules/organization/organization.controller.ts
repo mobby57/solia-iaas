@@ -1,13 +1,12 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import * as organizationService from './organization.service';
-import { CreateOrganizationSchema, UpdateOrganizationSchema } from './organization.schema';
 
 export async function getOrganizations(request: FastifyRequest, reply: FastifyReply) {
   const tenantId = (request as any).tenantId;
   try {
     const organizations = await organizationService.getOrganizations(tenantId);
     reply.send(organizations);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to fetch organizations' });
   }
 }
@@ -21,7 +20,7 @@ export async function getOrganizationById(request: FastifyRequest, reply: Fastif
       return;
     }
     reply.send(organization);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to fetch organization' });
   }
 }
@@ -32,7 +31,7 @@ export async function createOrganization(request: FastifyRequest, reply: Fastify
   try {
     const organization = await organizationService.createOrganization(organizationData, tenantId);
     reply.status(201).send(organization);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to create organization' });
   }
 }
@@ -42,13 +41,17 @@ export async function updateOrganization(request: FastifyRequest, reply: Fastify
   const organizationData = request.body as any;
   const tenantId = (request as any).tenantId;
   try {
-    const organization = await organizationService.updateOrganization(id, organizationData, tenantId);
+    const organization = await organizationService.updateOrganization(
+      id,
+      organizationData,
+      tenantId,
+    );
     if (!organization) {
       reply.status(404).send({ error: 'Organization not found' });
       return;
     }
     reply.send(organization);
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to update organization' });
   }
 }
@@ -59,7 +62,7 @@ export async function deleteOrganization(request: FastifyRequest, reply: Fastify
   try {
     await organizationService.deleteOrganization(id, tenantId);
     reply.status(204).send();
-  } catch (error) {
+  } catch (_error) {
     reply.status(500).send({ error: 'Failed to delete organization' });
   }
 }

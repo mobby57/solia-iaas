@@ -1,9 +1,9 @@
 import Fastify from 'fastify';
 import fastifySwagger from '../plugins/swagger';
+import { graphqlPlugin } from './graphql/graphqlPlugin';
 import { verifyJWT } from './middlewares/verifyJWT';
 import { authRoutes } from './routes/auth';
 import { userRoutes } from './routes/user.routes';
-import { graphqlPlugin } from './graphql/graphqlPlugin';
 
 const server = Fastify({
   logger: true,

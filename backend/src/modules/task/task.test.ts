@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
-import * as taskService from './task.service';
-import {prisma} from '../../lib/prisma';
+import { prisma } from '../../lib/prisma';
 import { cleanDatabase, disconnectDatabase } from '../../tests/testSetup';
+import * as taskService from './task.service';
 
 let validTenantId: string;
 let validUserId: string;
@@ -94,7 +94,7 @@ describe('Task Service', () => {
         userId: validUserId,
         missionId: validMissionId,
       },
-      validTenantId
+      validTenantId,
     );
     expect(task).not.toBeNull();
     expect(task!.tenantId).toBe(validTenantId);
@@ -102,10 +102,14 @@ describe('Task Service', () => {
 
   it('should update a task', async () => {
     try {
-      const task = await taskService.updateTask(validTaskId, {
-        status: 'completed',
-        date: new Date(),
-      }, validTenantId);
+      const task = await taskService.updateTask(
+        validTaskId,
+        {
+          status: 'completed',
+          date: new Date(),
+        },
+        validTenantId,
+      );
       expect(task).not.toBeNull();
       expect(task!.tenantId).toBe(validTenantId);
     } catch (error) {
@@ -117,8 +121,10 @@ describe('Task Service', () => {
   it('should throw error if updateTask updates no records', async () => {
     const nonExistentTaskId = '507f1f77bcf86cd799439099';
     await expect(
-      taskService.updateTask(nonExistentTaskId, { status: 'completed' }, validTenantId)
-    ).rejects.toThrow(/No task found for update with the given id and tenantId|No record was found for an update/);
+      taskService.updateTask(nonExistentTaskId, { status: 'completed' }, validTenantId),
+    ).rejects.toThrow(
+      /No task found for update with the given id and tenantId|No record was found for an update/,
+    );
   });
 
   it('should delete a task', async () => {

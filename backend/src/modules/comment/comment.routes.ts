@@ -1,4 +1,6 @@
 import { FastifyInstance } from 'fastify';
+import { verifyAuth } from '../../middlewares/verifyAuth';
+import { verifyRole } from '../../middlewares/verifyRole';
 import {
   getComments,
   getCommentById,
@@ -6,8 +8,6 @@ import {
   updateComment,
   deleteComment,
 } from './comment.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function commentRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

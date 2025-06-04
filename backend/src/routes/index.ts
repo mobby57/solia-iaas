@@ -1,13 +1,13 @@
 import { FastifyInstance } from 'fastify';
-import { userRoutes } from './user.routes';
+import { analyticsRoutes } from '../modules/analytics/analytics.routes';
+import { kycRoutes } from '../modules/kyc/kyc.routes';
 import { authRoutes } from './auth';
-import { organizationRoutes } from './organization.routes';
+import { documentRoutes } from './document.routes';
 import { donationRoutes } from './donation.routes';
 import { missionRoutes } from './mission.routes';
+import { organizationRoutes } from './organization.routes';
 import { taskRoutes } from './task.routes';
-import { documentRoutes } from './document.routes';
-import { kycRoutes } from '../modules/kyc/kyc.routes';
-import { analyticsRoutes } from '../modules/analytics/analytics.routes';
+import { userRoutes } from './user.routes';
 
 export async function routes(fastify: FastifyInstance) {
   await authRoutes(fastify);

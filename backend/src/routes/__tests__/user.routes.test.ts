@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
-import { userRoutes } from '../user.routes';
 import { vi, describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { userRoutes } from '../user.routes';
 
 describe('User Routes', () => {
   const fastify = Fastify();
@@ -30,8 +30,8 @@ describe('User Routes', () => {
       method: 'GET',
       url: '/users',
       headers: {
-        'x-tenant-id': 'default-tenant' // updated to match seed data tenantId
-      }
+        'x-tenant-id': 'default-tenant', // updated to match seed data tenantId
+      },
     });
 
     expect(response.statusCode).toBe(200);

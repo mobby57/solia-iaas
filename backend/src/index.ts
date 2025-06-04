@@ -1,44 +1,50 @@
-import Fastify from 'fastify';
-import dotenv from 'dotenv';
-dotenv.config();
-
+import type { IncomingMessage, ServerResponse } from 'http';
 import rateLimit from '@fastify/rate-limit';
+
+import dotenv from 'dotenv';
+import Fastify, {
+  FastifyInstance,
+  FastifyTypeProviderDefault,
+  RawServerDefault,
+  FastifyBaseLogger,
+} from 'fastify';
+dotenv.config();
 
 import swaggerPlugin from './plugins/swagger';
 
-import { authRoutes } from './routes/auth';
-import { userRoutes } from './routes/user.routes';
-import { donationRoutes } from './routes/donation.routes';
-import { taskRoutes } from './routes/task.routes';
 import queueUIRouter from './queues/queueUI';
+import { authRoutes } from './routes/auth';
+import { donationRoutes } from './routes/donation.routes';
 import { healthcheckRoutes } from './routes/healthcheck.routes';
+import { taskRoutes } from './routes/task.routes';
+import { userRoutes } from './routes/user.routes';
 
 export function buildApp() {
   const app = Fastify();
 
-  app.register(rateLimit, {
+  app.register(rateLimit as any, {
     max: 100,
     timeWindow: '1 minute',
   });
 
-  app.register(swaggerPlugin);
+  app.register(swaggerPlugin as any);
 
   // Add root route for GET /
-  app.get('/', async (request, reply) => {
+  app.get('/', async (_request, _reply) => {
     return { message: 'Solia API is up and running 🚀' };
   });
 
   // Add route to list all registered routes for debugging
-  app.get('/routes', async (request, reply) => {
+  app.get('/routes', async (_request, _reply) => {
     return app.printRoutes();
   });
 
-  app.register(authRoutes);
-  app.register(userRoutes);
-  app.register(donationRoutes);
-  app.register(taskRoutes);
-  app.register(queueUIRouter);
-  app.register(healthcheckRoutes);
+  app.register(authRoutes as any);
+  app.register(userRoutes as any);
+  app.register(donationRoutes as any);
+  app.register(taskRoutes as any);
+  app.register(queueUIRouter as any);
+  app.register(healthcheckRoutes as any);
 
   return app;
 }

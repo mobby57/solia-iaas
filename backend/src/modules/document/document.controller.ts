@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import * as documentService from './document.service';
 import { CreateDocumentSchema, UpdateDocumentSchema } from './document.schema';
+import * as documentService from './document.service';
 
 export async function getDocuments(request: FastifyRequest, reply: FastifyReply) {
   const tenantId = (request as any).tenantId;

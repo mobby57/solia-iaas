@@ -1,13 +1,7 @@
 import { FastifyInstance } from 'fastify';
-import {
-  getTasks,
-  getTaskById,
-  createTask,
-  updateTask,
-  deleteTask,
-} from './task.controller';
 import { verifyAuth } from '../../middlewares/verifyAuth';
 import { verifyRole } from '../../middlewares/verifyRole';
+import { getTasks, getTaskById, createTask, updateTask, deleteTask } from './task.controller';
 
 export async function taskRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

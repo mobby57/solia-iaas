@@ -1,5 +1,5 @@
-import { describe, test, expect, beforeAll, afterEach, vi } from 'vitest';
 import type { PrismaClient } from '@prisma/client';
+import { describe, test, expect, beforeAll, afterEach, vi } from 'vitest';
 import prismaClient from '../../lib/prisma';
 import * as userService from '../user.service';
 
@@ -72,10 +72,12 @@ describe('User Service with caching', () => {
     const userData = { name: 'Updated User', password: 'newpassword' };
 
     prisma.user.findUnique = vi.fn().mockResolvedValue({ id: userId, tenantId });
-    prisma.user.update = vi.fn().mockImplementation(async ({ where, data }: { where: any; data: any }) => ({
-      id: where.id,
-      ...data,
-    }));
+    prisma.user.update = vi
+      .fn()
+      .mockImplementation(async ({ where, data }: { where: any; data: any }) => ({
+        id: where.id,
+        ...data,
+      }));
 
     const updatedUser = await userService.updateUser(userId, userData, tenantId);
     expect(prisma.user.update).toHaveBeenCalled();

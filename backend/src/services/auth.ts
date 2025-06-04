@@ -1,20 +1,26 @@
-import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "./authUtils";
+import { PrismaClient } from '@prisma/client';
+import { hashPassword } from './authUtils';
 
 const prisma = new PrismaClient();
 
-export async function signup(email: string, password: string, name: string, roleId: string, tenantId: string) {
+export async function signup(
+  email: string,
+  password: string,
+  name: string,
+  roleId: string,
+  tenantId: string,
+) {
   try {
-    console.log("=== SIGNUP INITIATED ===");
-    console.log("email:", email);
-    console.log("name:", name);
-    console.log("roleId:", roleId);
-    console.log("tenantId:", tenantId);
+    console.log('=== SIGNUP INITIATED ===');
+    console.log('email:', email);
+    console.log('name:', name);
+    console.log('roleId:', roleId);
+    console.log('tenantId:', tenantId);
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
-    console.log("existingUser:", existingUser);
+    console.log('existingUser:', existingUser);
     if (existingUser) {
-      throw new Error("User already exists");
+      throw new Error('User already exists');
     }
 
     // Check if tenant exists
@@ -25,10 +31,10 @@ export async function signup(email: string, password: string, name: string, role
 
     // Create organization instead of tenant
     const organization = await prisma.organization.create({ data: { name, tenantId } });
-    console.log("organization created:", organization);
+    console.log('organization created:', organization);
 
     const hashedPassword = await hashPassword(password);
-    console.log("password hashed");
+    console.log('password hashed');
 
     // Create user with organizationId and roleId
     const user = await prisma.user.create({
@@ -49,11 +55,11 @@ export async function signup(email: string, password: string, name: string, role
         tenantId: true,
       },
     });
-    console.log("user created:", user);
+    console.log('user created:', user);
 
     return { user, organization };
   } catch (error) {
-    console.error("Error in signup:", error);
+    console.error('Error in signup:', error);
     throw error;
   }
 }

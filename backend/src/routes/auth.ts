@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { signupController, loginController } from '../controllers/authController';
-import { verifyJWT } from '../middlewares/verifyJWT';
+import verifyJWT from '../middlewares/verifyJWT';
 
 interface SignupBody {
   email: string;
@@ -17,13 +17,19 @@ interface LoginBody {
 }
 
 export async function authRoutes(fastify: FastifyInstance) {
-  fastify.post('/auth/signup', async (request: FastifyRequest<{ Body: SignupBody }>, reply: FastifyReply) => {
-    return signupController(request, reply);
-  });
+  fastify.post(
+    '/auth/signup',
+    async (request: FastifyRequest<{ Body: SignupBody }>, reply: FastifyReply) => {
+      return signupController(request, reply);
+    },
+  );
 
-  fastify.post('/auth/login', async (request: FastifyRequest<{ Body: LoginBody }>, reply: FastifyReply) => {
-    return loginController(request, reply);
-  });
+  fastify.post(
+    '/auth/login',
+    async (request: FastifyRequest<{ Body: LoginBody }>, reply: FastifyReply) => {
+      return loginController(request, reply);
+    },
+  );
 
   // Example protected route using verifyJWT middleware
   fastify.get('/auth/profile', { preHandler: [verifyJWT] }, async (request, reply) => {

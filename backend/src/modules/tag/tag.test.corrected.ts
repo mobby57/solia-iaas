@@ -15,7 +15,7 @@ describe('Tag Service - Corrected Tests', () => {
         targetId: tenantId,
         targetType: 'type',
       },
-      tenantId
+      tenantId,
     );
     createdTagId = created.id;
   });

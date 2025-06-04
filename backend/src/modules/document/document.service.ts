@@ -1,8 +1,8 @@
-import prisma from '../../lib/prisma';
 import { ObjectId } from 'mongodb';
+import prisma from '../../lib/prisma';
 
 function isValidObjectId(id: string): boolean {
-  return ObjectId.isValid(id) && (new ObjectId(id)).toHexString() === id;
+  return ObjectId.isValid(id) && new ObjectId(id).toHexString() === id;
 }
 
 export function generateObjectId(): string {

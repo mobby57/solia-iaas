@@ -1,5 +1,5 @@
-import fp from 'fastify-plugin';
 import fastifySwagger from '@fastify/swagger';
+import fp from 'fastify-plugin';
 
 export const swaggerPlugin = fp(async (fastify) => {
   fastify.register(fastifySwagger, {

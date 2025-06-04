@@ -3,7 +3,9 @@
 ## 1. Modules fondamentaux (V1)
 
 ### Objectif
+
 Créer une version fonctionnelle, sécurisée et évolutive avec les rôles suivants :
+
 - ONG / Association
 - Donateur
 - Auto-entrepreneur (recruteur)
@@ -12,13 +14,13 @@ Créer une version fonctionnelle, sécurisée et évolutive avec les rôles suiv
 
 ### Architecture des rôles et espaces
 
-| Rôle                       | Accès principal                          | Business model             | Particularités                         |
-| -------------------------- | ---------------------------------------- | -------------------------- | -------------------------------------- |
-| ONG                        | Espace ONG personnalisé                  | Abonnement mensuel         | Voir ses campagnes, ses donateurs      |
-| Donateur                   | Espace personnel avec historique         | Gratuit                    | Suivi des dons, documents, reçu fiscal |
-| Auto-entrepreneur          | Espace terrain (mobile/web)              | Commission sur chaque don  | Planning, rapport, synchronisation     |
-| Entreprise fundraising     | Interface partenaire avec statistiques   | Paiement à la performance  | Missions multiples, gestion d’équipe   |
-| Entité centrale            | Backoffice total + gestion contractuelle | Commission & orchestration | Gère les contrats, API, conformité     |
+| Rôle                   | Accès principal                          | Business model             | Particularités                         |
+| ---------------------- | ---------------------------------------- | -------------------------- | -------------------------------------- |
+| ONG                    | Espace ONG personnalisé                  | Abonnement mensuel         | Voir ses campagnes, ses donateurs      |
+| Donateur               | Espace personnel avec historique         | Gratuit                    | Suivi des dons, documents, reçu fiscal |
+| Auto-entrepreneur      | Espace terrain (mobile/web)              | Commission sur chaque don  | Planning, rapport, synchronisation     |
+| Entreprise fundraising | Interface partenaire avec statistiques   | Paiement à la performance  | Missions multiples, gestion d’équipe   |
+| Entité centrale        | Backoffice total + gestion contractuelle | Commission & orchestration | Gère les contrats, API, conformité     |
 
 ## 2. Modules clés à développer pour la V1
 

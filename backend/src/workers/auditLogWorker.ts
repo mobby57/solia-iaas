@@ -8,7 +8,7 @@ const auditLogWorker = new Worker(
     console.log(`📝 Processing audit log: ${JSON.stringify(logEntry)}`);
     // TODO: add real audit log processing here (e.g. save to DB)
   },
-  { connection: redis }
+  { connection: redis },
 );
 
 auditLogWorker.on('completed', (job) => {

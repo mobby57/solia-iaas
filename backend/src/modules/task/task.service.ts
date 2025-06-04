@@ -1,4 +1,4 @@
-import {prisma} from '../../lib/prisma';
+import { prisma } from '../../lib/prisma';
 
 export async function getTasks(tenantId: string) {
   return prisma.task.findMany({ where: { tenantId } });
@@ -34,7 +34,10 @@ export async function updateTask(id: string, data: any, tenantId: string) {
 
     return task;
   } catch (error: any) {
-    if (error.message === 'No task found for update with the given id and tenantId' || error.code === 'P2025') {
+    if (
+      error.message === 'No task found for update with the given id and tenantId' ||
+      error.code === 'P2025'
+    ) {
       throw new Error('No task found for update with the given id and tenantId');
     }
     throw error;

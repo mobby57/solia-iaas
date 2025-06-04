@@ -1,0 +1,4 @@
+# Ignorer les fichiers de configuration sensibles
+.env
+node_modules/
+dist/

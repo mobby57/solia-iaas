@@ -1,6 +1,5 @@
-import { prisma } from '../lib/prisma';
-
 import { ObjectId } from 'mongodb';
+import { prisma } from '../lib/prisma';
 
 export async function seedBaseData() {
   // Ensure base organizations exist

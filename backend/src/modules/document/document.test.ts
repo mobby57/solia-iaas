@@ -10,12 +10,15 @@ describe('Document Service', () => {
   });
 
   it('should create a document', async () => {
-    const newDocument = await createDocument({
-      title: 'Test Document',
+    const newDocument = await createDocument(
+      {
+        title: 'Test Document',
+        tenantId,
+        url: 'https://example.com/doc.pdf', // valid url added
+        name: 'Sample Name', // Removed content field as it does not exist in Prisma model
+      },
       tenantId,
-      url: 'https://example.com/doc.pdf', // valid url added
-      name: 'Sample Name' // Removed content field as it does not exist in Prisma model
-    }, tenantId);
+    );
 
     expect(newDocument).toHaveProperty('id');
     expect(newDocument.title).toBe('Test Document');

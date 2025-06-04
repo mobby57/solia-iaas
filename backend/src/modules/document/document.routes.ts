@@ -1,4 +1,6 @@
 import { FastifyInstance } from 'fastify';
+import { verifyAuth } from '../../middlewares/verifyAuth';
+import { verifyRole } from '../../middlewares/verifyRole';
 import {
   getDocuments,
   getDocumentById,
@@ -6,8 +8,6 @@ import {
   updateDocument,
   deleteDocument,
 } from './document.controller';
-import { verifyAuth } from '../../middlewares/verifyAuth';
-import { verifyRole } from '../../middlewares/verifyRole';
 
 export async function documentRoutes(fastify: FastifyInstance) {
   fastify.addHook('preHandler', verifyAuth);

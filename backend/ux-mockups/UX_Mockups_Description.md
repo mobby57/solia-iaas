@@ -4,6 +4,7 @@
 
 - **Header:** "ONG Dashboard"
 - **Sections:**
+
   - Campaign Overview: Summary cards showing active campaigns, goals, progress bars.
   - Donor Tracking: List or chart of recent donors, donation amounts, and statuses.
   - Mission Status: Table or cards showing missions with statuses (pending, active, completed).
@@ -15,6 +16,7 @@
 
 - **Header:** "Recruiter Dashboard"
 - **Sections:**
+
   - Today's Missions: List of missions assigned for the day with locations and times.
   - Planning Calendar: Weekly/monthly calendar view with mission assignments.
   - Daily Report Submission: Form to submit daily reports for completed missions.
